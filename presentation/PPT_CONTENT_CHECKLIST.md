@@ -1,7 +1,10 @@
 # PPT Content Checklist — RetainIQ Project Review
 
 Every detail the deck must contain, with the verified value for each.
-Status: ✅ = already in `RetainIQ_Project_Review.pptx`
+
+Status: ✅ = already in `RetainIQ_Project_Review.pptx` (24 slides: 20 content in
+three acts + 4 appendix slides, with the 14-phase progress rail on every content
+slide).
 
 ---
 
@@ -122,13 +125,9 @@ Status: ✅ = already in `RetainIQ_Project_Review.pptx`
 - ✅ Deployment: Gunicorn (gthread, 300s timeout, preload, worker recycling), Docker, Procfile, Render
 - ✅ Reproducibility: one script regenerates every chart and metric
 
-## 15. Technology stack — REQUIRED CONTENT, not yet in the deck
+## 15. Technology stack (slide 18)
 
-The deck was reverted to its 17-slide state, so this slide is **not built right now**.
-It is a stated requirement and will be rebuilt in the next version (planned position:
-immediately after Business Understanding).
-
-Content it must carry:
+- ✅ Built: four columns grouped by role, with the shared-package design rationale
 
 - **Language & data:** Python 3.11 · Pandas · NumPy · SQL Server · SQLAlchemy
 - **Machine learning:** Scikit-learn · Logistic Regression (deployed) · Random Forest · XGBoost · LightGBM · Joblib · SHAP
@@ -153,13 +152,11 @@ Content it must carry:
 - ✅ Counterfactual / what-if explanations
 - ✅ CRM integration and A/B testing of offers
 
-## 18. Closing — link + QR — REQUIRED CONTENT, not yet in the deck
+## 18. Closing — link + QR (slide 20)
 
-Also reverted out of the current deck. Must be rebuilt at the **very end** of the next
-version. The generator (`presentation/build_qr.py`) and both QR images were removed with
-the revert but are recoverable from commit `6465206`.
+- ✅ Built: full URL, verified live-app QR, repository QR, contribution line, questions prompt
 
-Content it must carry:
+Additional content it carries:
 
 - Live application URL printed in full: `retainiq-predictive-customer-retention-zq6x.onrender.com`
 - **QR code for the live app** (must be verified by decoding the rendered PNG)

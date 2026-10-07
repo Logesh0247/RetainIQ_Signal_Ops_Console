@@ -1,0 +1,2 @@
+f1_folds,f1_mean,f1_std,acc_folds,acc_mean,acc_std,deployed_f1
+"[np.float64(62.01), np.float64(57.66), np.float64(60.84), np.float64(66.67), np.float64(63.39)]",62.11,2.96,"[np.float64(81.19), np.float64(79.15), np.float64(80.92), np.float64(82.52), np.float64(82.15)]",81.19,1.18,60.6

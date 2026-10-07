@@ -471,6 +471,237 @@ def chart_architecture():
     _save(fig, "chart_architecture.png")
 
 
+# ---------------------------------------------------------------------------
+# Operating-point analysis (threshold sweep, imbalance experiment, stability)
+# ---------------------------------------------------------------------------
+
+def compute_operating_points():
+    """Measure how the deployed model behaves away from the default 0.5 cutoff."""
+    import joblib
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import (accuracy_score, f1_score, precision_score,
+                                 recall_score, roc_auc_score)
+    from sklearn.model_selection import StratifiedKFold, cross_val_score
+
+    X = pd.read_csv(ROOT / "Data" / "processed_data" / "train" / "X_train.csv")
+    y = pd.read_csv(ROOT / "Data" / "processed_data" / "train" / "y_train.csv").iloc[:, 0]
+    Xt = pd.read_csv(ROOT / "Data" / "processed_data" / "test" / "X_test.csv")
+    yt = pd.read_csv(ROOT / "Data" / "processed_data" / "test" / "y_test.csv").iloc[:, 0]
+
+    model = joblib.load(ROOT / "models" / "logistic_regression.pkl")
+    proba = model.predict_proba(Xt)[:, 1]
+
+    # --- threshold sweep on the held-out split ---------------------------
+    sweep = []
+    for t in [0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.70]:
+        pred = (proba >= t).astype(int)
+        sweep.append({
+            "threshold": t,
+            "precision": precision_score(yt, pred) * 100,
+            "recall": recall_score(yt, pred) * 100,
+            "f1": f1_score(yt, pred) * 100,
+            "flagged": int(pred.sum()),
+            "accuracy": accuracy_score(yt, pred) * 100,
+        })
+    sweep_df = pd.DataFrame(sweep)
+
+    # --- class-weight experiment ----------------------------------------
+    imbalance = []
+    for label, kwargs in [("baseline", {}), ("balanced", {"class_weight": "balanced"})]:
+        m = LogisticRegression(max_iter=5000, **kwargs).fit(X, y)
+        p = m.predict_proba(Xt)[:, 1]
+        pred = (p >= 0.5).astype(int)
+        imbalance.append({
+            "variant": label,
+            "recall": recall_score(yt, pred) * 100,
+            "precision": precision_score(yt, pred) * 100,
+            "f1": f1_score(yt, pred) * 100,
+            "accuracy": accuracy_score(yt, pred) * 100,
+            "auc": roc_auc_score(yt, p) * 100,
+        })
+    imbalance_df = pd.DataFrame(imbalance)
+
+    # --- stability: 5-fold stratified CV on the training split ----------
+    cv = cross_val_score(
+        LogisticRegression(max_iter=5000), X, y,
+        cv=StratifiedKFold(5, shuffle=True, random_state=42), scoring="f1") * 100
+    cv_acc = cross_val_score(
+        LogisticRegression(max_iter=5000), X, y,
+        cv=StratifiedKFold(5, shuffle=True, random_state=42), scoring="accuracy") * 100
+
+    stability = {
+        "f1_folds": [round(v, 2) for v in cv],
+        "f1_mean": round(cv.mean(), 2),
+        "f1_std": round(cv.std(), 2),
+        "acc_folds": [round(v, 2) for v in cv_acc],
+        "acc_mean": round(cv_acc.mean(), 2),
+        "acc_std": round(cv_acc.std(), 2),
+        "deployed_f1": round(f1_score(yt, (proba >= 0.5).astype(int)) * 100, 2),
+    }
+
+    sweep_df.to_csv(ASSETS / "operating_points.csv", index=False)
+    imbalance_df.to_csv(ASSETS / "imbalance_experiment.csv", index=False)
+    pd.DataFrame([stability]).to_csv(ASSETS / "stability_cv.csv", index=False)
+    return sweep_df, imbalance_df, stability
+
+
+def chart_threshold(sweep: pd.DataFrame, deployed=0.50):
+    best = float(sweep.loc[sweep["f1"].idxmax(), "threshold"])
+    fig, ax = plt.subplots(figsize=(8.8, 4.8))
+    ax.plot(sweep["threshold"], sweep["recall"], color=OK, marker="o", markersize=7,
+            linewidth=2.4, label="Recall — churners caught")
+    ax.plot(sweep["threshold"], sweep["precision"], color=ACTION, marker="o", markersize=7,
+            linewidth=2.4, label="Precision — flags that are right")
+    ax.plot(sweep["threshold"], sweep["f1"], color=WARN, marker="o", markersize=6,
+            linewidth=2.0, linestyle="--", label="F1 — balance of the two")
+
+    ax.axvline(deployed, color=BAD, linewidth=1.8, linestyle=":")
+    ax.axvline(best, color=OK, linewidth=1.8, linestyle=":")
+    ax.text(deployed + 0.006, 96, "deployed\n0.50", color=BAD, fontsize=10, va="top",
+            fontweight="bold", linespacing=1.3)
+    ax.text(best - 0.006, 96, "best F1\n0.35", color=OK, fontsize=10, va="top",
+            ha="right", fontweight="bold", linespacing=1.3)
+
+    r_deploy = sweep.loc[sweep["threshold"] == deployed, "recall"].iloc[0]
+    r_best = sweep.loc[sweep["threshold"] == best, "recall"].iloc[0]
+    ax.annotate(f"{r_best:.1f}%", xy=(best, r_best), xytext=(best, r_best + 4.5),
+                ha="center", color=OK, fontsize=10.5, fontweight="bold")
+    ax.annotate(f"{r_deploy:.1f}%", xy=(deployed, r_deploy), xytext=(deployed, r_deploy - 5.5),
+                ha="center", color=OK, fontsize=10.5, fontweight="bold")
+
+    ax.text(0.292, 26.5,
+            f"Dropping the cut-off from 0.50 to 0.35 catches {r_best - r_deploy:.1f} "
+            f"points more churners\nin the same held-out set, at the cost of "
+            f"{sweep.loc[sweep['threshold'] == 0.50, 'precision'].iloc[0] - sweep.loc[sweep['threshold'] == 0.35, 'precision'].iloc[0]:.1f} "
+            f"points of precision.",
+            color=TEXT, fontsize=10.2, linespacing=1.45, va="center")
+
+    ax.set_xlabel("Decision threshold (probability cut-off)")
+    ax.set_ylabel("Score (%)")
+    ax.set_ylim(20, 102)
+    ax.set_xlim(0.27, 0.73)
+    ax.set_title("Moving the cut-off trades precision for recall — and recall is the scarce one",
+                 loc="left", pad=14, fontsize=13.5)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.20), ncol=3, fontsize=10.2,
+              handlelength=1.6, columnspacing=1.6)
+    _strip(ax)
+    _save(fig, "chart_threshold.png")
+
+
+def chart_imbalance(imb: pd.DataFrame):
+    """Dumbbell: what changes when the classes are re-weighted."""
+    fig, ax = plt.subplots(figsize=(8.4, 3.6))
+    base, bal = imb.iloc[0], imb.iloc[1]
+    rows = [("Recall", base["recall"], bal["recall"], OK),
+            ("F1", base["f1"], bal["f1"], WARN),
+            ("Precision", base["precision"], bal["precision"], ACTION),
+            ("ROC-AUC", base["auc"], bal["auc"], MUTED)]
+    for i, (label, a, b, color) in enumerate(rows):
+        y = len(rows) - 1 - i
+        ax.plot([a, b], [y, y], color=color, linewidth=2.6, zorder=1,
+                solid_capstyle="round")
+        ax.scatter([a], [y], s=110, color=PANEL, edgecolor=MUTED, linewidth=2, zorder=2)
+        ax.scatter([b], [y], s=120, color=color, zorder=3)
+        delta = b - a
+        ax.text(max(a, b) + 2.5, y, f"{delta:+.2f} pts" if abs(delta) > 0.05 else "no change",
+                va="center", color=color, fontsize=10.5, fontweight="bold")
+        ax.text(min(a, b) - 2.5, y, label, va="center", ha="right", color=TEXT, fontsize=11.5)
+
+    ax.set_ylim(-0.7, len(rows) - 0.3)
+    ax.set_xlim(40, 100)
+    ax.set_xlabel("Score (%) on the held-out test set")
+    ax.set_yticks([])
+    ax.set_title("Re-weighting the classes buys recall without touching the model's ranking",
+                 loc="left", pad=14, fontsize=13.5)
+    ax.grid(axis="y", alpha=0.0)
+    _strip(ax)
+    ax.annotate("hollow = baseline   ·   filled = class_weight='balanced'",
+                xy=(0, 0), xycoords="axes fraction", xytext=(0, -0.30),
+                textcoords="axes fraction", color=MUTED, fontsize=9.5)
+    _save(fig, "chart_imbalance.png")
+
+
+def chart_cv(stability: dict):
+    fig, ax = plt.subplots(figsize=(8.4, 3.4))
+    folds = stability["f1_folds"]
+    xs = np.arange(1, len(folds) + 1)
+    ax.scatter(xs, folds, s=130, color=OK, zorder=3)
+    mean = stability["f1_mean"]
+    ax.axhline(mean, color=OK, linewidth=2.0, linestyle="-")
+    ax.axhspan(mean - stability["f1_std"], mean + stability["f1_std"], color=OK, alpha=0.12)
+    ax.axhline(stability["deployed_f1"], color=BAD, linewidth=2.0, linestyle=":")
+    ax.text(len(folds) + 0.12, stability["deployed_f1"],
+            f"  deployed 60.60%", color=BAD, va="center", fontsize=10.5, fontweight="bold")
+    ax.text(0.85, mean + 0.5, f"CV mean {mean:.2f}%", color=OK, fontsize=10.5,
+            fontweight="bold")
+    for x, v in zip(xs, folds):
+        ax.text(x, v + 0.9, f"{v:.1f}", ha="center", color=TEXT, fontsize=9.5)
+    ax.set_xticks(xs, [f"fold {i}" for i in xs])
+    ax.set_xlim(0.5, len(folds) + 1.55)
+    ax.set_ylim(min(folds) - 4, max(folds) + 3)
+    ax.set_ylabel("F1 (%)")
+    ax.set_title(f"Five-fold cross-validation: F1 {mean:.2f}% ± {stability['f1_std']:.2f}% "
+                 f"— the single split is not carrying the result",
+                 loc="left", pad=14, fontsize=12.5)
+    ax.grid(axis="x", alpha=0.0)
+    _strip(ax)
+    _save(fig, "chart_cv.png")
+
+
+def chart_cycle():
+    """The 14-phase development cycle, grouped into the deck's three acts."""
+    fig, ax = plt.subplots(figsize=(11.8, 5.0))
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 54)
+    ax.axis("off")
+    ax.grid(False)
+
+    arcs = [
+        ("ACT I · THE SIGNAL FADES", "DATA", ACTION,
+         ["Business\nUnderstanding", "Data\nCollection", "Data Cleaning\n& Preprocessing",
+          "Exploratory\nData Analysis", "Feature\nEngineering"]),
+        ("ACT II · READING THE SIGNAL", "MODELLING", WARN,
+         ["Model\nDevelopment", "Model\nEvaluation", "Model\nSelection"]),
+        ("ACT III · THE SIGNAL RECOVERED", "INTELLIGENCE & DELIVERY", OK,
+         ["Explain-\nability", "Risk\nSegmentation", "Retention\nIntelligence",
+          "Business\nIntelligence", "Web\nApplication", "Deployment"]),
+    ]
+
+    pad = 2.0
+    usable = 100 - pad * 2
+    box_h = 10.5
+    label_gap = 1.8
+
+    # explicit vertical layout: label line, then the row of boxes, then a gap
+    tops = [50.5, 33.5, 16.5]
+
+    for (act, arc_name, color, phases), top in zip(arcs, tops):
+        y = top - box_h
+        ax.text(pad, top + 0.4, act, color=color, fontsize=10.5, fontweight="bold",
+                va="bottom")
+        ax.text(100 - pad, top + 0.4, arc_name, color=MUTED, fontsize=9.5,
+                va="bottom", ha="right", fontweight="bold")
+
+        n = len(phases)
+        arrow_w = 1.6
+        box_w = (usable - (n - 1) * arrow_w) / n
+        for i, label in enumerate(phases):
+            x = pad + i * (box_w + arrow_w)
+            ax.add_patch(FancyBboxPatch(
+                (x, y), box_w, box_h,
+                boxstyle="round,pad=0.3,rounding_size=1.0",
+                linewidth=1.5, edgecolor=color, facecolor=PANEL))
+            ax.text(x + box_w / 2, y + box_h / 2, label, ha="center", va="center",
+                    color=TEXT, fontsize=9.4, linespacing=1.35)
+            if i < n - 1:
+                ax.add_patch(FancyArrowPatch(
+                    (x + box_w + 0.30, y + box_h / 2),
+                    (x + box_w + arrow_w - 0.30, y + box_h / 2),
+                    arrowstyle="-|>", mutation_scale=11, linewidth=1.3, color=LINE))
+
+    _save(fig, "chart_cycle.png")
+
+
 def main():
     truth = load_truth()
     print("scoring full portfolio through the production pipeline ...")
@@ -493,6 +724,18 @@ def main():
     chart_revenue(scores)
     chart_high_risk_profile(scores)
     chart_architecture()
+
+    print("\ncomputing operating points, stability and the cycle diagram ...")
+    sweep, imbalance, stability = compute_operating_points()
+    print(sweep.round(2).to_string(index=False))
+    print("\nimbalance:\n", imbalance.round(2).to_string(index=False))
+    print("\nstability:", {k: v for k, v in stability.items() if "folds" not in k})
+    print("folds:", stability["f1_folds"])
+
+    chart_threshold(sweep)
+    chart_imbalance(imbalance)
+    chart_cv(stability)
+    chart_cycle()
 
     metrics.to_csv(ASSETS / "model_metrics.csv", index=False)
     print("\nall assets written")
