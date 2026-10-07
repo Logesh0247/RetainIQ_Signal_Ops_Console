@@ -66,6 +66,43 @@ RAIL_Y = 6.90
 FOOT_RULE_Y = 7.06
 FOOT_TEXT_Y = 7.12
 
+# --- vertical layout engine -------------------------------------------------
+# Every slide's content must occupy exactly this band, so no slide ends early.
+CONTENT_TOP = 1.66
+CONTENT_BOTTOM = 6.80
+CAV = CONTENT_BOTTOM - CONTENT_TOP          # 5.14in of usable height
+
+
+def stack(rows, top=CONTENT_TOP, bottom=CONTENT_BOTTOM):
+    """rows: [(height, gap_after), ...] -> [(y, h), ...] filling top..bottom.
+
+    Heights are treated as relative weights, so a slide designed to a nominal
+    height self-corrects to fill the band exactly.
+    """
+    total_gaps = sum(g for _, g in rows)
+    avail = (bottom - top) - total_gaps
+    total_w = sum(h for h, _ in rows)
+    out, y = [], top
+    for h, g in rows:
+        hh = avail * (h / total_w)
+        out.append((y, hh))
+        y += hh + g
+    return out
+
+
+def img_h(path, w):
+    """Height an image occupies at a given width, preserving aspect ratio."""
+    with Image.open(path) as im:
+        iw, ih = im.size
+    return w * ih / iw
+
+
+def img_w(path, h):
+    with Image.open(path) as im:
+        iw, ih = im.size
+    return h * iw / ih
+
+
 PHASES = [
     "Business Understanding", "Data Collection", "Data Cleaning & Preprocessing",
     "Exploratory Data Analysis", "Feature Engineering", "Model Development",
@@ -310,29 +347,31 @@ def build():
     n += 1
     s = add_slide(prs)
     bar(s, 0, 0, SW, 0.085, OK)
-    text(s, M, 1.10, 9.6, 0.28,
+    text(s, M, 1.22, 9.6, 0.28,
          [{"t": "FINAL YEAR PROJECT   ·   B.SC. DATA SCIENCE", "pt": 11,
            "color": OK, "bold": True, "mono": True, "space_after": 0}])
-    text(s, M, 1.46, 10.4, 1.62,
+    text(s, M, 1.60, 10.4, 1.68,
          [{"t": "RetainIQ", "pt": 54, "color": TEXT, "bold": True, "space_after": 2},
           {"t": "Signal Ops Console", "pt": 28, "color": OK, "bold": True,
            "space_after": 0}])
-    bar(s, M, 3.16, 2.1, 0.035, OK)
-    text(s, M, 3.42, 8.1, 1.0,
+    bar(s, M, 3.42, 2.1, 0.035, OK)
+    text(s, M, 3.70, 8.1, 1.0,
          [{"t": "An explainable machine learning platform for customer churn "
                 "prediction, risk intelligence and retention strategy.",
            "pt": 14.5, "color": MUTED, "space_after": 0, "spacing": 1.25}])
 
-    signal_meter(s, 11.05, 1.62, filled=5, scale=1.0,
+    signal_meter(s, 11.05, 1.78, filled=5, scale=1.05,
                  label="signal strength", color=OK)
 
-    kpi(s, M, 4.72, 2.36, 1.02, "80.34%", "TEST ACCURACY", OK)
-    kpi(s, M + 2.50, 4.72, 2.36, 1.02, "84.91%", "ROC-AUC", OK)
-    kpi(s, M + 5.00, 4.72, 2.36, 1.02, "7,043", "CUSTOMERS SCORED", ACTION)
-    kpi(s, M + 7.50, 4.72, 4.59, 1.02, "$92,539",
-        "MONTHLY REVENUE AT RISK IN THE HIGH-RISK BAND", BAD, 25, 9)
+    _rk = stack([(1.24, 0.26), (0.74, 0)], top=4.94, bottom=6.84)
+    (r_kpi, r_cred) = _rk[0], _rk[1]
+    kpi(s, M, r_kpi[0], 2.36, r_kpi[1], "80.34%", "TEST ACCURACY", OK, 27, 9.5)
+    kpi(s, M + 2.50, r_kpi[0], 2.36, r_kpi[1], "84.91%", "ROC-AUC", OK, 27, 9.5)
+    kpi(s, M + 5.00, r_kpi[0], 2.36, r_kpi[1], "7,043", "CUSTOMERS SCORED", ACTION, 27, 9.5)
+    kpi(s, M + 7.50, r_kpi[0], 4.59, r_kpi[1], "$92,539",
+        "MONTHLY REVENUE AT RISK IN THE HIGH-RISK BAND", BAD, 27, 9)
 
-    text(s, M, 6.00, 12.1, 0.72,
+    text(s, M, r_cred[0], 12.1, r_cred[1],
          [{"t": "Logesh S.   ·   B.Sc. Data Science", "pt": 12.5, "color": TEXT,
            "bold": True, "space_after": 3},
           {"t": f"Live application: {LIVE_URL_DISPLAY}     ·     Source: {REPO_DISPLAY}",
@@ -356,12 +395,11 @@ Then move — do not read the tiles.
     eyebrow(s, "THE DEVELOPMENT CYCLE")
     y = heading(s, "Fourteen phases, three acts",
                 "This is the map for the whole talk — every slide that follows is one of these boxes")
-    image_fit(s, ASSETS / "chart_cycle.png", M, y - 0.04, CW, 3.30)
-    callout(s, M, y + 3.38, CW, 1.14, "HOW TO READ THE DECK",
-            "Act I shows the signal fading — the business problem and the data that "
-            "records it. Act II is reading the signal — building the model and "
-            "interrogating how far to trust it. Act III is the signal recovered — what "
-            "the intelligence is worth and the product that delivers it.", OK)
+    _r = stack([(4.38, 0.08), (0.68, 0)]); r_chart, r_cap = _r[0], _r[1]
+    image_fit(s, ASSETS / "chart_cycle.png", M, r_chart[0], CW, img_h(ASSETS / "chart_cycle.png", CW))
+    callout(s, M, r_cap[0], CW, r_cap[1], "HOW TO READ THE DECK",
+            "Three acts — the signal fades (I), reading the signal (II), the signal "
+            "recovered (III). Every slide names its phase in the footer.", OK)
     footer(s, n)
     notes(s, """
 (0:35–1:05) "Everything I show you maps to one of these fourteen boxes, and the
@@ -378,7 +416,8 @@ Promise the structure and then keep it. Do not narrate every box.
     eyebrow(s, "PHASE 01  ·  BUSINESS UNDERSTANDING")
     y = heading(s, "The problem: retention is still reactive",
                 "Reports explain what happened. They do not say who leaves next.")
-    bullets(s, M, y + 0.06, 6.55, 2.1, [
+    _r = stack([(2.40, 0.20), (2.54, 0)]); r_bul, r_cards = _r[0], _r[1]
+    bullets(s, M, r_bul[0], 6.55, r_bul[1], [
         ("Churn compounds.",
          "26.54% of this customer base churned — 1,869 of 7,043 customers."),
         ("Dashboards describe, they do not prioritise.",
@@ -391,23 +430,24 @@ Promise the structure and then keep it. Do not narrate every box.
           ("Why are they at risk?", "Feature contributions behind each prediction", WARN),
           ("What should we do?", "A retention action matched to the risk drivers", OK),
           ("What is at stake?", "Monthly recurring revenue exposed in each risk band", BAD)]
+    card_h = (r_cards[1] - 0.14) / 2
     for i, (q, sub, color) in enumerate(qs):
         x = M + (i % 2) * 3.34
-        yy = y + 2.42 + (i // 2) * 1.30
-        rect(s, x, yy, 3.16, 1.14, fill=PANEL, edge=LINE)
-        bar(s, x, yy + 0.14, 0.035, 0.86, color)
-        text(s, x + 0.20, yy + 0.16, 2.86, 0.9,
+        yy = r_cards[0] + (i // 2) * (card_h + 0.14)
+        rect(s, x, yy, 3.16, card_h, fill=PANEL, edge=LINE)
+        bar(s, x, yy + 0.16, 0.035, card_h - 0.32, color)
+        text(s, x + 0.22, yy + 0.18, 2.82, card_h - 0.34,
              [{"t": q, "pt": 12, "color": TEXT, "bold": True, "space_after": 3},
               {"t": sub, "pt": 9.8, "color": MUTED, "space_after": 0, "spacing": 1.14}])
 
-    rect(s, 7.62, y + 0.06, 5.09, 4.90, fill=PANEL, edge=LINE)
-    text(s, 7.86, y + 0.22, 4.6, 0.3,
-         [{"t": "THE BASE RATE", "pt": 10, "color": MUTED, "bold": True, "mono": True,
+    text(s, 7.86, CONTENT_TOP + 0.20, 4.6, 0.30,
+         [{"t": "THE BASE RATE", "pt": 10.5, "color": MUTED, "bold": True, "mono": True,
            "space_after": 0}])
-    image_fit(s, ASSETS / "chart_churn_split.png", 7.72, y + 0.50, 4.89, 3.90)
-    text(s, 7.86, y + 4.40, 4.6, 0.5,
-         [{"t": "Predicting \"nobody churns\" is already 73.46% accurate — which is why "
-                "accuracy alone decides nothing in this project.",
+    chart_h = CAV - 0.44 - 0.66 - 0.14
+    image_fit(s, ASSETS / "chart_churn_split.png", 7.72, CONTENT_TOP + 0.48, 4.89, chart_h)
+    text(s, 7.86, CONTENT_TOP + CAV - 0.66, 4.6, 0.66,
+         [{"t": "1,869 churned · 5,174 retained of 7,043. Predicting \"nobody churns\" is "
+                "already 73.46% accurate — which is why accuracy alone decides nothing here.",
            "pt": 10.5, "color": MUTED, "space_after": 0, "spacing": 1.16}])
     footer(s, n, phase=0)
     notes(s, """
@@ -428,11 +468,12 @@ That line earns credibility early and sets up Phase 07.
              ("30", "ML FEATURES", TEXT), ("26.54%", "CHURN RATE", BAD),
              ("80 / 20", "STRATIFIED SPLIT", ACTION)]
     tw = (CW - 4 * 0.16) / 5
+    _r = stack([(1.18, 0.20), (3.76, 0)]); r_tile, r_body = _r[0], _r[1]
     for i, (v, l, c) in enumerate(tiles):
-        kpi(s, M + i * (tw + 0.16), y + 0.04, tw, 1.06, v, l, c, 20, 9)
+        kpi(s, M + i * (tw + 0.16), r_tile[0], tw, r_tile[1], v, l, c, 21, 9)
 
-    yy = y + 1.30
-    text(s, M, yy, 5.9, 2.6,
+    yy = r_body[0]
+    text(s, M, yy, 5.9, r_body[1],
          [{"t": "What a row contains", "pt": 13, "color": OK, "bold": True,
            "space_after": 6},
           {"t": "  ▸  Customer profile — gender, senior citizen, partner, dependents",
@@ -446,11 +487,11 @@ That line earns credibility early and sets up Phase 07.
           {"t": "Target: Churn Label (Yes / No), converted to 1 / 0.",
            "pt": 11.3, "color": MUTED, "space_after": 0, "space_before": 8}])
 
-    callout(s, 6.85, yy, 5.86, 1.30, "CLASS BALANCE AND THE SPLIT",
+    callout(s, 6.85, yy, 5.86, r_body[1] / 2 - 0.08, "CLASS BALANCE AND THE SPLIT",
             "1,869 churned against 5,174 retained. The split is stratified, so both "
             "halves carry the identical 26.54% churn rate: 5,634 rows train, 1,409 "
             "rows are held back and touched only once.", ACTION)
-    callout(s, 6.85, yy + 1.48, 5.86, 1.30, "TRAIN / SERVE PARITY",
+    callout(s, 6.85, yy + r_body[1] / 2 + 0.08, 5.86, r_body[1] / 2 - 0.08, "TRAIN / SERVE PARITY",
             "The 30 encoded columns are frozen in feature_columns.pkl and rebuilt by "
             "the same preprocessing code for every upload — training and live scoring "
             "cannot drift apart. There is a unit test for exactly this.", OK)
@@ -474,25 +515,26 @@ tested, so the app cannot silently score on the wrong schema."
              ("Encode", "16 categoricals → 27 flags", WARN),
              ("30 features", "frozen column contract", OK)]
     sw_ = (CW - 3 * 0.30) / 4
+    _r = stack([(1.30, 0.20), (1.50, 0.16), (1.98, 0)]); r_flow, r_leak, r_bul = _r[0], _r[1], _r[2]
     for i, (t, sub, c) in enumerate(steps):
         x = M + i * (sw_ + 0.30)
-        rect(s, x, y + 0.06, sw_, 1.10, fill=PANEL_2, edge=c, edge_w=1.2)
-        text(s, x + 0.18, y + 0.20, sw_ - 0.36, 0.86,
-             [{"t": t, "pt": 13, "color": TEXT, "bold": True, "space_after": 3},
-              {"t": sub, "pt": 9.8, "color": MUTED, "space_after": 0, "spacing": 1.14}])
+        rect(s, x, r_flow[0], sw_, r_flow[1], fill=PANEL_2, edge=c, edge_w=1.2)
+        text(s, x + 0.20, r_flow[0] + 0.22, sw_ - 0.40, r_flow[1] - 0.40,
+             [{"t": t, "pt": 13.5, "color": TEXT, "bold": True, "space_after": 4},
+              {"t": sub, "pt": 10, "color": MUTED, "space_after": 0, "spacing": 1.14}])
         if i < 3:
-            text(s, x + sw_ + 0.02, y + 0.36, 0.28, 0.4,
+            text(s, x + sw_ + 0.02, r_flow[0] + r_flow[1] / 2 - 0.20, 0.28, 0.4,
                  [{"t": "→", "pt": 17, "color": OK, "bold": True, "space_after": 0,
                    "align": PP_ALIGN.CENTER}], audit=False)
 
-    yy = y + 1.44
-    callout(s, M, yy, CW, 1.34,
+    yy = r_leak[0]
+    callout(s, M, yy, CW, r_leak[1],
             "LEAKAGE PREVENTION — the detail that makes the results believable",
             "Churn Score, Churn Reason, Churn Category and Customer Status were removed "
             "before training. All four are only known after a customer has already "
             "churned, so keeping them would inflate the metrics and break the model in "
             "production. This is the difference between a demo and a deployable model.")
-    bullets(s, M, yy + 1.54, 12.09, 1.5, [
+    bullets(s, M, r_bul[0], 12.09, r_bul[1], [
         ("Cleaning", "Data-type correction, 11 blank TotalCharges values (all zero-tenure new "
                      "customers), duplicate checks, categorical normalisation, removal of ID "
                      "and geographic columns that carry no predictive value."),
@@ -515,9 +557,12 @@ One sentence on encoding and move on.
     eyebrow(s, "PHASE 04  ·  EXPLORATORY DATA ANALYSIS")
     y = heading(s, "What the data said",
                 "Three patterns that shaped the model — and the retention strategy")
-    image_fit(s, ASSETS / "chart_contract.png", M, y + 0.04, 5.95, 3.24)
-    image_fit(s, ASSETS / "chart_tenure.png", M + 6.15, y + 0.04, 5.94, 3.24)
-    yy = y + 3.40
+    _r = stack([(3.40, 0.16), (1.58, 0)]); r_img, r_card = _r[0], _r[1]
+    box_h = r_img[1]
+    for i, chart in enumerate(["chart_contract.png", "chart_tenure.png"]):
+        cw_ = min(5.95, img_w(ASSETS / chart, box_h))
+        image_fit(s, ASSETS / chart, M + i * 6.15, r_img[0], cw_, box_h)
+    yy = r_card[0]
     cards = [
         ("Contract is the strongest signal",
          "42.7% churn on month-to-month vs 2.8% on two-year contracts — a 15× gap.", OK),
@@ -531,9 +576,9 @@ One sentence on encoding and move on.
     cw = (CW - 2 * 0.18) / 3
     for i, (t, b, c) in enumerate(cards):
         x = M + i * (cw + 0.18)
-        rect(s, x, yy, cw, 1.66, fill=PANEL, edge=LINE)
-        bar(s, x, yy + 0.16, 0.035, 1.34, c)
-        text(s, x + 0.20, yy + 0.18, cw - 0.40, 1.34,
+        rect(s, x, yy, cw, r_card[1], fill=PANEL, edge=LINE)
+        bar(s, x, yy + 0.16, 0.035, r_card[1] - 0.32, c)
+        text(s, x + 0.20, yy + 0.18, cw - 0.40, r_card[1] - 0.34,
              [{"t": t, "pt": 11.5, "color": c, "bold": True, "space_after": 4},
               {"t": b, "pt": 10.2, "color": TEXT, "space_after": 0, "spacing": 1.18}])
     footer(s, n, phase=3)
@@ -553,13 +598,14 @@ what the recommendation engine acts on."
     eyebrow(s, "PHASE 05  ·  FEATURE ENGINEERING")
     y = heading(s, "Thirty features, one frozen contract",
                 "Three numeric measures, twenty-seven explicit flags — and a test that guards them")
-    kpi(s, M, y + 0.04, 3.92, 1.10, "3", "NUMERIC FEATURES", ACTION, 26, 9.5)
-    kpi(s, M + 4.10, y + 0.04, 3.92, 1.10, "27", "BINARY FLAGS", WARN, 26, 9.5)
-    kpi(s, M + 8.20, y + 0.04, 3.89, 1.10, "30", "TOTAL MODEL INPUTS", OK, 26, 9.5)
+    _r = stack([(1.24, 0.20), (3.70, 0)]); r_tile, r_panel = _r[0], _r[1]
+    kpi(s, M, r_tile[0], 3.92, r_tile[1], "3", "NUMERIC FEATURES", ACTION, 28, 9.5)
+    kpi(s, M + 4.10, r_tile[0], 3.92, r_tile[1], "27", "BINARY FLAGS", WARN, 28, 9.5)
+    kpi(s, M + 8.20, r_tile[0], 3.89, r_tile[1], "30", "TOTAL MODEL INPUTS", OK, 28, 9.5)
 
-    yy = y + 1.32
-    rect(s, M, yy, 5.95, 2.72, fill=PANEL, edge=LINE)
-    text(s, M + 0.22, yy + 0.16, 5.51, 2.4,
+    yy = r_panel[0]
+    rect(s, M, yy, 5.95, r_panel[1], fill=PANEL, edge=LINE)
+    text(s, M + 0.22, yy + 0.18, 5.51, r_panel[1] - 0.36,
          [{"t": "THE THREE NUMERIC MEASURES", "pt": 10.5, "color": ACTION, "bold": True,
            "mono": True, "space_after": 6},
           {"t": "Tenure Months, Monthly Charges, Total Charges — the only continuous "
@@ -569,11 +615,14 @@ what the recommendation engine acts on."
            "mono": True, "space_after": 6},
           {"t": "Assigning 1, 2, 3 to DSL / Fiber / None would invent an ordering that "
                 "does not exist. Flags keep the model honest about what these categories "
-                "actually are.", "pt": 10.8, "color": TEXT, "space_after": 0,
-           "spacing": 1.18}])
+                "actually are.", "pt": 10.8, "color": TEXT, "space_after": 12,
+           "spacing": 1.18},
+          {"t": "Eleven Total Charges values are blank — every one of them belongs to a "
+                "zero-tenure customer, so the missing rows never hide a churn signal.",
+           "pt": 10.8, "color": MUTED, "space_after": 0, "spacing": 1.18}])
 
-    rect(s, 6.75, yy, 5.96, 2.72, fill=PANEL_2, edge=OK, edge_w=1.2)
-    text(s, 6.95, yy + 0.16, 5.56, 2.4,
+    rect(s, 6.75, yy, 5.96, r_panel[1], fill=PANEL_2, edge=OK, edge_w=1.2)
+    text(s, 6.95, yy + 0.18, 5.56, r_panel[1] - 0.36,
          [{"t": "THE COLUMN CONTRACT", "pt": 10.5, "color": OK, "bold": True,
            "mono": True, "space_after": 6},
           {"t": "The exact 30 column names are saved to feature_columns.pkl alongside the "
@@ -583,7 +632,10 @@ what the recommendation engine acts on."
           {"t": "If the two ever disagree, the request fails loudly rather than silently "
                 "scoring on a misaligned frame — the most common way a student project "
                 "works in the notebook and quietly breaks in the app.", "pt": 10.8,
-           "color": MUTED, "space_after": 0, "spacing": 1.18}])
+           "color": MUTED, "space_after": 10, "spacing": 1.18},
+          {"t": "Uploads are validated against that same list, so a mismatched CSV is "
+                "rejected before a single row is scored.", "pt": 10.8, "color": OK,
+           "space_after": 0, "spacing": 1.18}])
     footer(s, n, phase=4)
     notes(s, """
 (4:05–4:35) Short slide, but it answers a question examiners like: "why did you
@@ -601,19 +653,23 @@ producing garbage."
     eyebrow(s, "PHASE 06  ·  MODEL DEVELOPMENT")
     y = heading(s, "Four algorithms, one pipeline",
                 "Same features, same split, same scoring code — only the algorithm changes")
-    image_fit(s, ASSETS / "chart_models.png", M, y + 0.04, 7.85, 3.40)
-    bullets(s, 8.75, y + 0.10, 3.96, 3.30, [
+    _r = stack([(4.02, 0.16), (0.96, 0)]); r_row, r_call = _r[0], _r[1]
+    ch_w = min(7.11, img_w(ASSETS / "chart_models.png", r_row[1]))
+    image_fit(s, ASSETS / "chart_models.png", M, r_row[0], ch_w, r_row[1])
+    bullets(s, M + ch_w + 0.28, r_row[0] + 0.06, CW - ch_w - 0.28, r_row[1] - 0.12, [
         ("Logistic Regression", "linear baseline; interpretable coefficients"),
         ("Random Forest", "bagged trees; captures non-linearity"),
         ("XGBoost & LightGBM", "gradient boosting; strong on tabular data"),
     ], pt=10.8, gap=8)
-    rect(s, 8.75, y + 2.42, 3.96, 1.02, fill=PANEL_2, edge=WARN, edge_w=1.2)
-    text(s, 8.93, y + 2.54, 3.60, 0.84,
+    rx = M + ch_w + 0.28
+    rw = CW - ch_w - 0.28
+    rect(s, rx, r_row[0] + r_row[1] - 1.14, rw, 1.14, fill=PANEL_2, edge=WARN, edge_w=1.2)
+    text(s, rx + 0.18, r_row[0] + r_row[1] - 1.02, rw - 0.36, 0.96,
          [{"t": "Benchmark ladder (F1)", "pt": 10.2, "color": WARN, "bold": True,
            "space_after": 3},
           {"t": "LR 60.6 · LightGBM 59.6 · XGBoost 58.5 · RF 57.1",
            "pt": 10.2, "color": TEXT, "space_after": 0, "mono": True}])
-    callout(s, M, y + 3.58, CW, 1.06, "WHY FOUR MODELS AND NOT ONE",
+    callout(s, M, r_call[0], CW, r_call[1], "WHY FOUR MODELS AND NOT ONE",
             "A single model proves nothing. Four algorithms on the same pipeline show the "
             "result is a property of the features and the problem — not of one lucky "
             "configuration. Accuracy, precision, recall, F1 and ROC-AUC were all "
@@ -634,17 +690,24 @@ explainability for free." That sets up Phase 09.
     eyebrow(s, "PHASE 07  ·  MODEL EVALUATION")
     y = heading(s, "Measuring the model — and its stability",
                 "Held-out test set of 1,409 customers, plus five-fold cross-validation")
-    image_fit(s, ASSETS / "chart_confusion.png", M, y + 0.02, 4.62, 2.72)
-    image_fit(s, ASSETS / "chart_cv.png", M + 4.80, y + 0.02, 7.31, 2.72)
+    _r = stack([(2.88, 0.14), (1.16, 0.10), (0.86, 0)])
+    r_img, r_tile, r_txt = _r[0], _r[1], _r[2]
+    ih = r_img[1]
+    w1 = img_w(ASSETS / "chart_confusion.png", ih)
+    w2 = img_w(ASSETS / "chart_cv.png", ih)
+    scale = min(1.0, (CW - 0.20) / (w1 + w2))
+    image_fit(s, ASSETS / "chart_confusion.png", M, r_img[0], w1 * scale, ih * scale)
+    image_fit(s, ASSETS / "chart_cv.png", M + w1 * scale + 0.20, r_img[0],
+              w2 * scale, ih * scale)
 
-    yy = y + 2.86
+    yy = r_tile[0]
     tiles = [("80.34%", "ACCURACY", TEXT), ("64.74%", "PRECISION", TEXT),
              ("56.95%", "RECALL", WARN), ("60.60%", "F1", OK), ("84.91%", "ROC-AUC", OK)]
     tw = (CW - 4 * 0.16) / 5
     for i, (v, l, c) in enumerate(tiles):
-        kpi(s, M + i * (tw + 0.16), yy, tw, 0.90, v, l, c, 18, 9)
+        kpi(s, M + i * (tw + 0.16), yy, tw, r_tile[1], v, l, c, 20, 9)
 
-    text(s, M, yy + 1.00, CW, 0.50,
+    text(s, M, r_txt[0], CW, r_txt[1],
          [{"t": "Honest reading: of 374 churners in the test set the model catches 213. "
                 "The deployed 60.60% F1 sits inside a cross-validated range of "
                 "62.11% ± 2.96% (accuracy 81.19% ± 1.18%), so the single split is not "
@@ -676,26 +739,28 @@ first, and I'll show you exactly how on the next slide."
         ("Random Forest", "78.99%", "62.34%", "52.67%", "57.10%", "83.48%", False),
     ]
     colw = [4.35, 1.56, 1.56, 1.42, 1.42, 1.79]
-    yy = y + 0.06
+    _r = stack([(3.70, 0.16), (1.28, 0)]); r_tbl, r_call = _r[0], _r[1]
+    row_h = (r_tbl[1] - 0.06) / 5
+    yy = r_tbl[0]
     for ri, row in enumerate(rows):
         x = M
         hdr = row[-1]
         for ci, cell in enumerate(row[:-1]):
             if ri == 0:
-                rect(s, x, yy, colw[ci], 0.50, fill=PANEL_2, edge=LINE)
+                rect(s, x, yy, colw[ci], row_h, fill=PANEL_2, edge=LINE)
             elif ri == 1:
-                rect(s, x, yy, colw[ci], 0.54, fill=PANEL, edge=OK, edge_w=1.2)
+                rect(s, x, yy, colw[ci], row_h, fill=PANEL, edge=OK, edge_w=1.2)
             else:
-                rect(s, x, yy, colw[ci], 0.54, fill=PANEL, edge=LINE)
+                rect(s, x, yy, colw[ci], row_h, fill=PANEL, edge=LINE)
             color = MUTED if hdr else (OK if ri == 1 and ci > 0 else TEXT)
-            text(s, x + 0.14, yy + 0.13, colw[ci] - 0.24, 0.32,
-                 [{"t": cell, "pt": 11 if not hdr else 10.2, "color": color,
+            text(s, x + 0.14, yy + (row_h - 0.32) / 2, colw[ci] - 0.24, 0.32,
+                 [{"t": cell, "pt": 11.5 if not hdr else 10.5, "color": color,
                    "bold": hdr or (ri == 1 and ci == 0), "space_after": 0,
                    "mono": hdr or ci > 0}], audit=False)
             x += colw[ci]
-        yy += 0.60
+        yy += row_h + 0.015
 
-    callout(s, M, yy + 0.14, CW, 1.30, "THE DECISION RULE",
+    callout(s, M, r_call[0], CW, r_call[1], "THE DECISION RULE",
             "Accuracy alone would have picked LightGBM by one hundredth of a point. The "
             "choice was made on F1 and ROC-AUC, because a retention team cares about "
             "ranking risk correctly and catching churners — not about the share of all "
@@ -716,10 +781,15 @@ operationally is ranking risk, not classifying the majority correctly."
     eyebrow(s, "PHASE 08  ·  MODEL SELECTION  ·  THE OPERATING POINT")
     y = heading(s, "The cut-off was a default — not a decision",
                 "0.5 is arbitrary. Measuring it turns the model's weakest number into a choice")
-    image_fit(s, ASSETS / "chart_threshold.png", M, y + 0.02, 7.90, 4.30)
+    ch_w = 8.40
+    image_fit(s, ASSETS / "chart_threshold.png", M, CONTENT_TOP, ch_w,
+              img_h(ASSETS / "chart_threshold.png", ch_w))
+    px = M + ch_w + 0.22
+    pw = SW - M - px
+    _p = stack([(2.49, 0.16), (2.49, 0)]); p1, p2 = _p[0], _p[1]
 
-    rect(s, 8.72, y + 0.02, 3.99, 2.04, fill=PANEL, edge=LINE)
-    text(s, 8.92, y + 0.16, 3.63, 1.74,
+    rect(s, px, p1[0], pw, p1[1], fill=PANEL, edge=LINE)
+    text(s, px + 0.20, p1[0] + 0.16, pw - 0.40, p1[1] - 0.32,
          [{"t": "WHAT THE SWEEP SHOWS", "pt": 10.5, "color": OK, "bold": True,
            "mono": True, "space_after": 6},
           {"t": "At 0.35 the model catches 71.7% of churners instead of 57.0%, and F1 "
@@ -727,7 +797,7 @@ operationally is ranking risk, not classifying the majority correctly."
                 "deployed setting.", "pt": 10.6, "color": TEXT, "space_after": 0,
            "spacing": 1.18}])
 
-    callout(s, 8.72, y + 2.20, 3.99, 2.12,
+    callout(s, px, p2[0], pw, p2[1],
             "THE PROOF THAT MATTERS",
             "Training with class_weight='balanced' lifts recall to 77.81% while ROC-AUC "
             "barely moves: 84.89 against 84.90. The model already ranks customers "
@@ -753,9 +823,15 @@ something I should silently change."
     eyebrow(s, "PHASE 09  ·  EXPLAINABILITY")
     y = heading(s, "Why the model flags a customer",
                 "The profile of the high-risk band, and a per-customer explanation in the app")
-    image_fit(s, ASSETS / "chart_high_risk_profile.png", M, y + 0.02, 7.55, 3.78)
-    rect(s, 8.40, y + 0.04, 4.31, 1.90, fill=PANEL, edge=LINE)
-    text(s, 8.60, y + 0.18, 3.95, 1.66,
+    _l = stack([(4.12, 0.14), (0.88, 0)]); lc, lcap = _l[0], _l[1]
+    cw_ = 8.00
+    image_fit(s, ASSETS / "chart_high_risk_profile.png", M, lc[0], cw_,
+              img_h(ASSETS / "chart_high_risk_profile.png", cw_))
+    px = M + cw_ + 0.29
+    pw = SW - M - px
+    _p = stack([(2.49, 0.16), (2.49, 0)]); p1, p2 = _p[0], _p[1]
+    rect(s, px, p1[0], pw, p1[1], fill=PANEL, edge=LINE)
+    text(s, px + 0.20, p1[0] + 0.16, pw - 0.40, p1[1] - 0.32,
          [{"t": "PER-CUSTOMER EXPLANATION", "pt": 10.5, "color": OK, "bold": True,
            "mono": True, "space_after": 6},
           {"t": "For each prediction the console shows the top drivers, computed as "
@@ -763,7 +839,7 @@ something I should silently change."
                 "logistic model, with human labels like \"Fiber optic internet\" or "
                 "\"Account tenure\".", "pt": 10.6, "color": TEXT, "space_after": 0,
            "spacing": 1.18}])
-    callout(s, 8.40, y + 2.06, 4.31, 1.74, "ON SHAP — STATED PRECISELY",
+    callout(s, px, p2[0], pw, p2[1], "ON SHAP — STATED PRECISELY",
             "SHAP was explored during the project; summary, bar, dependence and waterfall "
             "plots are in the repository. Production explanation is aligned to the "
             "deployed Logistic Regression instead — accurate for a linear model, and it "
@@ -790,24 +866,33 @@ no runtime cost." Do not overclaim here.
              ("30 – 60%", "MEDIUM RISK", "1,473 customers", WARN),
              ("≥ 60%", "HIGH RISK", "1,135 customers", BAD)]
     bw = (CW - 2 * 0.24) / 3
+    _r = stack([(1.00, 0.18), (3.96, 0)]); r_band, r_left = _r[0], _r[1]
+    r_panel_top = r_left[0]
+    r_panel_h = r_left[1]
     for i, (rng, label, count, c) in enumerate(bands):
         x = M + i * (bw + 0.24)
-        rect(s, x, y + 0.02, bw, 0.94, fill=PANEL, edge=c, edge_w=1.2)
-        text(s, x + 0.22, y + 0.14, bw - 0.44, 0.72,
+        rect(s, x, r_band[0], bw, r_band[1], fill=PANEL, edge=c, edge_w=1.2)
+        text(s, x + 0.22, r_band[0] + 0.16, bw - 0.44, r_band[1] - 0.32,
              [{"t": f"{rng}   {label}", "pt": 11.5, "color": c, "bold": True,
                "mono": True, "space_after": 2},
               {"t": count, "pt": 12.5, "color": TEXT, "space_after": 0}])
-    image_fit(s, ASSETS / "chart_risk_bands.png", M, y + 1.04, 7.72, 3.36)
-    rect(s, 8.62, y + 1.06, 4.09, 1.58, fill=PANEL_2, edge=OK, edge_w=1.2)
-    text(s, 8.82, y + 1.20, 3.73, 1.34,
+    lw = 7.72
+    image_fit(s, ASSETS / "chart_risk_bands.png", M, r_left[0], lw,
+              img_h(ASSETS / "chart_risk_bands.png", lw))
+    px, pw = 8.62, SW - M - 8.62
+    _p = stack([(2.49, 0.16), (2.49, 0)], top=r_panel_top + 0.06,
+               bottom=r_panel_top + r_panel_h)
+    p1, p2 = _p[0], _p[1]
+    rect(s, px, p1[0], pw, p1[1], fill=PANEL_2, edge=OK, edge_w=1.2)
+    text(s, px + 0.20, p1[0] + 0.16, pw - 0.40, p1[1] - 0.32,
          [{"t": "VALIDATION", "pt": 10.5, "color": OK, "bold": True, "mono": True,
            "space_after": 5},
           {"t": "The bands track reality: actual churn is 9.5% in low risk, 42.0% in "
                 "medium and 73.0% in high risk. The segmentation is not decoration — it "
                 "orders the portfolio correctly.", "pt": 10.6, "color": TEXT,
            "space_after": 0, "spacing": 1.18}])
-    rect(s, 8.62, y + 2.78, 4.09, 1.62, fill=PANEL, edge=BAD, edge_w=1.2)
-    text(s, 8.82, y + 2.92, 3.73, 1.38,
+    rect(s, px, p2[0], pw, p2[1], fill=PANEL, edge=BAD, edge_w=1.2)
+    text(s, px + 0.20, p2[0] + 0.16, pw - 0.40, p2[1] - 0.32,
          [{"t": "THE OPERATIONAL PAYOFF", "pt": 10.5, "color": BAD, "bold": True,
            "mono": True, "space_after": 5},
           {"t": "Instead of calling 7,043 customers, the team starts with 1,135 — 16.1% "
@@ -830,9 +915,11 @@ Close operationally: "the team starts with 1,135 customers instead of 7,043."
     eyebrow(s, "PHASE 11  ·  RETENTION INTELLIGENCE")
     y = heading(s, "From risk to action — and to money",
                 "2,608 at-risk customers each received a specific recommendation")
-    image_fit(s, ASSETS / "chart_revenue.png", M, y + 0.04, 7.10, 3.04)
-    rect(s, 7.95, y + 0.02, 4.76, 3.08, fill=PANEL, edge=LINE)
-    text(s, 8.15, y + 0.16, 4.40, 2.84,
+    _r = stack([(3.34, 0.16), (1.64, 0)]); r_chart, r_call = _r[0], _r[1]
+    image_fit(s, ASSETS / "chart_revenue.png", M, r_chart[0], 7.10,
+              img_h(ASSETS / "chart_revenue.png", 7.10))
+    rect(s, 7.95, CONTENT_TOP, 4.76, CAV, fill=PANEL, edge=LINE)
+    text(s, 8.15, CONTENT_TOP + 0.18, 4.40, CAV - 0.36,
          [{"t": "RECOMMENDATIONS ISSUED (FULL PORTFOLIO)", "pt": 10.5, "color": OK,
            "bold": True, "mono": True, "space_after": 7},
           {"t": "Promote Long-Term Contract            792", "pt": 10.4, "color": TEXT, "space_after": 3, "mono": True},
@@ -845,13 +932,12 @@ Close operationally: "the team starts with 1,135 customers instead of 7,043."
           {"t": "Driven by each customer's own risk factors — a month-to-month customer "
                 "with no security gets a different offer than a loyal high-value one.",
            "pt": 10.2, "color": MUTED, "space_after": 0, "spacing": 1.16}])
-    yy = y + 3.24
-    callout(s, M, yy, 7.10, 1.20, "SPEAK PRECISELY ABOUT THIS NUMBER",
+    callout(s, M, r_call[0], 7.10, r_call[1], "SPEAK PRECISELY ABOUT THIS NUMBER",
             "RetainIQ reports monthly revenue at risk — the recurring charges sitting "
             "inside flagged customers. $92,539/month in high risk, $200,302 including "
             "medium. It is exposure, not money already saved.", WARN)
-    rect(s, 7.95, yy, 4.76, 1.20, fill=PANEL, edge=LINE)
-    text(s, 8.15, yy + 0.14, 4.40, 0.98,
+    rect(s, 7.95, r_call[0], 4.76, r_call[1], fill=PANEL, edge=LINE)
+    text(s, 8.15, r_call[0] + 0.16, 4.40, r_call[1] - 0.32,
          [{"t": "DECISION FRAMEWORK", "pt": 10.5, "color": OK, "bold": True,
            "mono": True, "space_after": 5},
           {"t": "Data → insight → prediction → explanation → action → business value. "
@@ -872,10 +958,12 @@ a month sitting in the high-risk band. I deliberately do not call it savings."
     eyebrow(s, "PHASE 12  ·  BUSINESS INTELLIGENCE")
     y = heading(s, "The descriptive layer beneath the predictions",
                 "A four-page Power BI dashboard for the people who fund the retention team")
-    picture_card(s, PBI / "page1_executive_overview.png.png", M, y + 0.04, 6.30, 2.36)
-    picture_card(s, PBI / "page3_risk_intelligence.png.png", M + 6.48, y + 0.04, 5.61, 2.36)
-
-    yy = y + 2.56
+    _r = stack([(3.41, 0.16), (1.57, 0)]); r_pbi, r_cards = _r[0], _r[1]
+    for i, src in enumerate(["page1_executive_overview.png.png",
+                             "page3_risk_intelligence.png.png"]):
+        pic_h = img_h(PBI / src, 5.82) + 0.18
+        picture_card(s, PBI / src, M + i * 6.30, r_pbi[0], 6.00, pic_h)
+    yy = r_cards[0]
     cards = [
         ("Executive overview", "Portfolio KPIs, churn rate and revenue in one view for management.", OK),
         ("Customer insights", "Where churn concentrates — contract, tenure, service mix.", ACTION),
@@ -885,9 +973,9 @@ a month sitting in the high-risk band. I deliberately do not call it savings."
     cw = (CW - 3 * 0.18) / 4
     for i, (t, b, c) in enumerate(cards):
         x = M + i * (cw + 0.18)
-        rect(s, x, yy, cw, 1.62, fill=PANEL, edge=LINE)
-        bar(s, x, yy + 0.14, 0.035, 1.34, c)
-        text(s, x + 0.20, yy + 0.16, cw - 0.42, 1.32,
+        rect(s, x, yy, cw, r_cards[1], fill=PANEL, edge=LINE)
+        bar(s, x, yy + 0.14, 0.035, r_cards[1] - 0.28, c)
+        text(s, x + 0.20, yy + 0.16, cw - 0.42, r_cards[1] - 0.30,
              [{"t": t, "pt": 11.5, "color": c, "bold": True, "space_after": 4},
               {"t": b, "pt": 10.0, "color": TEXT, "space_after": 0, "spacing": 1.16}])
     footer(s, n, phase=11)
@@ -905,23 +993,27 @@ strategy. One sentence each, don't linger.
     eyebrow(s, "PHASE 13  ·  WEB APPLICATION")
     y = heading(s, "The product: a Signal Ops Console",
                 "A working Flask application — bulk scoring, dashboard, private reports")
-    image_fit(s, ASSETS / "chart_architecture.png", M, y - 0.02, CW, 2.20)
-    yy = y + 2.28
-    ph = 2.58
-    image_fit(s, IMAGES / "06.prediction_dashboard.png", M, yy, 5.40, ph)
-    image_fit(s, IMAGES / "04.Bulk_prediction.png", M + 5.58, yy, 3.90, ph)
-    rect(s, M + 9.66, yy, 2.43, ph, fill=PANEL, edge=LINE)
-    text(s, M + 9.82, yy + 0.12, 2.11, ph - 0.24,
-         [{"t": "WHAT A USER DOES", "pt": 9.5, "color": OK, "bold": True, "mono": True,
-           "space_after": 5},
-          {"t": "1  Upload a CSV", "pt": 9.3, "color": TEXT, "space_after": 3},
-          {"t": "2  Validate the file", "pt": 9.3, "color": TEXT, "space_after": 3},
-          {"t": "3  Score the portfolio", "pt": 9.3, "color": TEXT, "space_after": 3},
-          {"t": "4  Read the KPIs", "pt": 9.3, "color": TEXT, "space_after": 3},
-          {"t": "5  Drill into a customer", "pt": 9.3, "color": TEXT, "space_after": 3},
-          {"t": "6  Download the report", "pt": 9.3, "color": TEXT, "space_after": 7},
-          {"t": "Reports are scoped to the visitor by a signed cookie — never a shared "
-                "folder.", "pt": 8.7, "color": MUTED, "space_after": 0, "spacing": 1.12}])
+    _r = stack([(3.86, 0.16), (1.12, 0)]); r_img, r_strip = _r[0], _r[1]
+    a1 = img_w(IMAGES / "06.prediction_dashboard.png", 1.0)
+    a2 = img_w(IMAGES / "04.Bulk_prediction.png", 1.0)
+    ph = (CW - 0.22) / (a1 + a2)
+    d1 = a1 * ph
+    image_fit(s, IMAGES / "06.prediction_dashboard.png", M, r_img[0], d1, ph)
+    image_fit(s, IMAGES / "04.Bulk_prediction.png", M + d1 + 0.22, r_img[0],
+              a2 * ph, ph)
+
+    rect(s, M, r_strip[0], CW, r_strip[1], fill=PANEL, edge=LINE)
+    text(s, M + 0.24, r_strip[0] + 0.14, CW - 2.72, r_strip[1] - 0.26,
+         [{"t": "WHAT A REVIEWER DOES", "pt": 9.8, "color": OK, "bold": True,
+           "mono": True, "space_after": 4},
+          {"t": "Upload a CSV  →  validate the file before scoring  →  score the whole "
+                "portfolio\nRead churn rate, risk split and revenue at risk  →  drill "
+                "into a customer  →  download a private report",
+           "pt": 10.4, "color": TEXT, "space_after": 0, "spacing": 1.16}])
+    text(s, SW - M - 2.20, r_strip[0] + 0.14, 2.20, 0.34,
+         [{"t": "REPORTS ARE PRIVATE — SCOPED BY SIGNED COOKIE", "pt": 8.4,
+           "color": MUTED, "bold": True, "mono": True, "space_after": 0,
+           "align": PP_ALIGN.RIGHT}], audit=False)
     footer(s, n, phase=12)
     notes(s, """
 (9:15–9:45) This is the demo slide. If the live site is warm, switch to it for
@@ -946,18 +1038,20 @@ test."
         ("The free tier sleeps", "An idle instance is suspended, so the first visitor waits for a cold start.", "warm it before demoing", WARN),
     ]
     ch = (CW - 0.26) / 2
+    _r = stack([(1.94, 0.16), (1.94, 0.16), (0.94, 0)])
+    r1, r2, r_call = _r[0], _r[1], _r[2]
     for i, (t, b, fix, c) in enumerate(problems):
         x = M + (i % 2) * (ch + 0.26)
-        yy = y + 0.04 + (i // 2) * 1.78
-        rect(s, x, yy, ch, 1.62, fill=PANEL, edge=LINE)
-        bar(s, x, yy + 0.14, 0.035, 1.34, c)
-        text(s, x + 0.22, yy + 0.16, ch - 0.46, 1.30,
+        yy, hh = (r1 if i < 2 else r2)
+        rect(s, x, yy, ch, hh, fill=PANEL, edge=LINE)
+        bar(s, x, yy + 0.16, 0.035, hh - 0.32, c)
+        text(s, x + 0.24, yy + 0.18, ch - 0.50, hh - 0.36,
              [{"t": t, "pt": 12, "color": TEXT, "bold": True, "space_after": 4},
               {"t": b, "pt": 10.2, "color": MUTED, "space_after": 5, "spacing": 1.16},
               {"t": f"→ fixed by {fix}", "pt": 10.4, "color": c, "bold": True,
                "mono": True, "space_after": 0}])
 
-    callout(s, M, y + 3.66, CW, 1.00, "SHIPPED AS",
+    callout(s, M, r_call[0], CW, r_call[1], "SHIPPED AS",
             "Gunicorn with a threaded worker · Dockerfile and Procfile · version-pinned "
             "requirements · hosted on Render, where the application answers at the URL on "
             "the closing slide.", ACTION)
@@ -982,38 +1076,39 @@ before we start."
                 "One requirement drove the whole stack: the same code must train the "
                 "model and serve it")
     groups = [
-        ("LANGUAGE & DATA", OK, ["Python 3.11", "Pandas — data manipulation",
-                                 "NumPy — numerical computing",
-                                 "SQL Server (extraction layer)",
-                                 "SQLAlchemy — DB connection"]),
-        ("MACHINE LEARNING", WARN, ["Scikit-learn — training & evaluation",
-                                    "Logistic Regression (deployed)",
+        ("LANGUAGE & DATA", OK, ["Python 3.11", "Pandas — data handling",
+                                 "NumPy — numerics",
+                                 "SQL Server — extraction",
+                                 "SQLAlchemy — DB layer"]),
+        ("MACHINE LEARNING", WARN, ["Scikit-learn — training",
+                                    "Logistic Regression (live)",
                                     "Random Forest · XGBoost · LightGBM",
-                                    "Joblib — model persistence",
-                                    "SHAP — explainability research"]),
-        ("WEB APPLICATION", ACTION, ["Flask — application server",
-                                     "Jinja2 — server-side templates",
-                                     "HTML5 · CSS3 (custom design system)",
-                                     "Vanilla JavaScript — dashboards",
-                                     "Gunicorn — WSGI production server"]),
-        ("APIs & DELIVERY", BAD, ["FastAPI + Pydantic — typed API",
-                                  "Docker — container image",
-                                  "Render — cloud hosting",
-                                  "Git & GitHub — version control",
-                                  "Microsoft Power BI (.pbix / .pbit)"]),
+                                    "Joblib — model files",
+                                    "SHAP — research only"]),
+        ("WEB APPLICATION", ACTION, ["Flask — app server",
+                                     "Jinja2 — templates",
+                                     "HTML5 · CSS3 — design system",
+                                     "Vanilla JavaScript — charts",
+                                     "Gunicorn — WSGI server"]),
+        ("APIs & DELIVERY", BAD, ["FastAPI + Pydantic — API",
+                                  "Docker — container",
+                                  "Render — cloud host",
+                                  "Git & GitHub — versioning",
+                                  "Power BI (.pbix / .pbit)"]),
     ]
     cw = (CW - 3 * 0.20) / 4
+    _r = stack([(3.34, 0.16), (1.64, 0)]); r_col, r_call = _r[0], _r[1]
     for i, (title, coll, items) in enumerate(groups):
         x = M + i * (cw + 0.20)
-        rect(s, x, y + 0.04, cw, 2.62, fill=PANEL, edge=LINE)
-        bar(s, x, y + 0.04, cw, 0.045, coll)
-        blocks = [{"t": title, "pt": 10, "color": coll, "bold": True, "mono": True,
-                   "space_after": 8}]
-        blocks += [{"t": f"·  {item}", "pt": 10.4, "color": TEXT, "space_after": 5,
-                    "spacing": 1.10} for item in items]
-        text(s, x + 0.20, y + 0.24, cw - 0.40, 2.28, blocks)
+        rect(s, x, r_col[0], cw, r_col[1], fill=PANEL, edge=LINE)
+        bar(s, x, r_col[0], cw, 0.045, coll)
+        blocks = [{"t": title, "pt": 11, "color": coll, "bold": True, "mono": True,
+                   "space_after": 13}]
+        blocks += [{"t": f"·  {item}", "pt": 11.6, "color": TEXT, "space_after": 15,
+                    "spacing": 1.14} for item in items]
+        text(s, x + 0.20, r_col[0] + 0.26, cw - 0.40, r_col[1] - 0.46, blocks)
 
-    callout(s, M, y + 2.82, CW, 1.14, "THE DESIGN CHOICE BEHIND THE STACK",
+    callout(s, M, r_call[0], CW, r_call[1], "THE DESIGN CHOICE BEHIND THE STACK",
             "Preprocessing, the saved column contract and the scoring functions are a "
             "single Python package imported by the notebooks, the Flask app, the FastAPI "
             "wrapper and the evaluation scripts. That is what makes training and "
@@ -1036,8 +1131,8 @@ repository.
                 "Where it breaks, who it might treat unfairly, and what the next cycle fixes")
     col = (CW - 2 * 0.26) / 3
 
-    rect(s, M, y + 0.02, col, 3.62, fill=PANEL, edge=WARN, edge_w=1.2)
-    text(s, M + 0.22, y + 0.16, col - 0.44, 3.32,
+    rect(s, M, CONTENT_TOP, col, CAV, fill=PANEL, edge=WARN, edge_w=1.2)
+    text(s, M + 0.22, CONTENT_TOP + 0.18, col - 0.44, CAV - 0.36,
          [{"t": "LIMITATIONS — STATED PLAINLY", "pt": 11, "color": WARN, "bold": True,
            "mono": True, "space_after": 7},
           {"t": "▸  Trained on historical data from one telecom; behaviour may not transfer",
@@ -1051,8 +1146,8 @@ repository.
           {"t": "▸  Revenue figures are exposure, not realised savings",
            "pt": 10.6, "color": TEXT, "space_after": 0, "spacing": 1.16}])
 
-    rect(s, M + col + 0.26, y + 0.02, col, 3.62, fill=PANEL, edge=BAD, edge_w=1.2)
-    text(s, M + col + 0.48, y + 0.16, col - 0.44, 3.32,
+    rect(s, M + col + 0.26, CONTENT_TOP, col, CAV, fill=PANEL, edge=BAD, edge_w=1.2)
+    text(s, M + col + 0.48, CONTENT_TOP + 0.18, col - 0.44, CAV - 0.36,
          [{"t": "FAIRNESS — AN OPEN QUESTION", "pt": 11, "color": BAD, "bold": True,
            "mono": True, "space_after": 7},
           {"t": "▸  Senior citizens churn at 41.7% — nearly double the base rate. A model "
@@ -1066,8 +1161,8 @@ repository.
                 "would be a prerequisite, not a nice-to-have.", "pt": 10.6, "color": TEXT,
            "space_after": 0, "spacing": 1.16}])
 
-    rect(s, M + 2 * (col + 0.26), y + 0.02, col, 3.62, fill=PANEL, edge=ACTION, edge_w=1.2)
-    text(s, M + 2 * (col + 0.26) + 0.22, y + 0.16, col - 0.44, 3.32,
+    rect(s, M + 2 * (col + 0.26), CONTENT_TOP, col, CAV, fill=PANEL, edge=ACTION, edge_w=1.2)
+    text(s, M + 2 * (col + 0.26) + 0.22, CONTENT_TOP + 0.18, col - 0.44, CAV - 0.36,
          [{"t": "THE NEXT CYCLE", "pt": 11, "color": ACTION, "bold": True, "mono": True,
            "space_after": 7},
           {"t": "▸  Move the operating point deliberately — 0.35 catches 71.7% of churners "
@@ -1101,8 +1196,9 @@ monitoring."
     eyebrow(s, "THANK YOU")
     y = heading(s, "See it running",
                 "Scan to open the live application and score a customer portfolio")
-    rect(s, M, y + 0.06, 5.82, 3.58, fill=PANEL, edge=OK, edge_w=1.4)
-    text(s, M + 0.28, y + 0.28, 5.26, 3.16,
+    _r = stack([(4.34, 0.20), (0.60, 0)]); r_pan, r_credit = _r[0], _r[1]
+    rect(s, M, r_pan[0], 5.82, r_pan[1], fill=PANEL, edge=OK, edge_w=1.4)
+    text(s, M + 0.28, r_pan[0] + 0.24, 5.26, r_pan[1] - 0.48,
          [{"t": "LIVE APPLICATION", "pt": 10.5, "color": OK, "bold": True, "mono": True,
            "space_after": 8},
           {"t": LIVE_URL_DISPLAY, "pt": 11, "color": TEXT, "bold": True,
@@ -1113,33 +1209,41 @@ monitoring."
            "pt": 10.8, "color": MUTED, "space_after": 12, "spacing": 1.20},
           {"t": "SOURCE CODE", "pt": 10.5, "color": ACTION, "bold": True, "mono": True,
            "space_after": 5},
-          {"t": REPO_DISPLAY, "pt": 10.6, "color": TEXT, "mono": True, "space_after": 0,
-           "spacing": 1.16}])
+          {"t": REPO_DISPLAY, "pt": 10.6, "color": TEXT, "mono": True, "space_after": 12,
+           "spacing": 1.16},
+          {"t": "Notebooks 01–09, the Flask console, the FastAPI wrapper and the "
+                "nine-test suite are all in the repository.", "pt": 10.4,
+           "color": MUTED, "space_after": 10, "spacing": 1.18},
+          {"t": "The host is a free tier — open it once a minute before the review so "
+                "the first scan is instant.", "pt": 10.4, "color": WARN,
+           "space_after": 0, "spacing": 1.18}])
 
-    rect(s, 6.54, y + 0.06, 2.98, 3.58, fill=WHITE, edge=LINE)
-    image_fit(s, ASSETS / "qr_live_app.png", 6.70, y + 0.24, 2.66, 2.66)
-    text(s, 6.70, y + 3.00, 2.66, 0.52,
+    rect(s, 6.54, r_pan[0], 2.98, r_pan[1], fill=WHITE, edge=LINE)
+    qs = min(2.86, r_pan[1] - 0.92)
+    image_fit(s, ASSETS / "qr_live_app.png", 6.54 + (2.98 - qs) / 2, r_pan[0] + 0.22, qs, qs)
+    text(s, 6.70, r_pan[0] + r_pan[1] - 0.68, 2.66, 0.52,
          [{"t": "SCAN FOR THE", "pt": 9.5, "color": INK, "bold": True, "mono": True,
            "space_after": 2, "align": PP_ALIGN.CENTER},
           {"t": "LIVE APPLICATION", "pt": 9.5, "color": INK, "bold": True, "mono": True,
            "space_after": 0, "align": PP_ALIGN.CENTER}])
 
-    rect(s, 9.62, y + 0.06, 3.09, 3.58, fill=PANEL, edge=LINE)
-    image_fit(s, ASSETS / "qr_repository.png", 10.54, y + 0.24, 1.25, 1.25)
-    text(s, 9.82, y + 0.28, 0.66, 1.00,
+    rect(s, 9.62, r_pan[0], 3.09, r_pan[1], fill=PANEL, edge=LINE)
+    image_fit(s, ASSETS / "qr_repository.png", 10.54, r_pan[0] + 0.24, 1.25, 1.25)
+    text(s, 9.82, r_pan[0] + 0.28, 0.66, 1.00,
          [{"t": "SOURCE", "pt": 8.5, "color": MUTED, "bold": True, "mono": True,
            "space_after": 3},
           {"t": "REPO", "pt": 8.5, "color": MUTED, "bold": True, "mono": True,
            "space_after": 0}], audit=False)
-    text(s, 9.82, y + 1.52, 2.69, 2.00,
+    text(s, 9.82, r_pan[0] + 1.62, 2.69, 2.40,
          [{"t": "Thank you", "pt": 19, "color": TEXT, "bold": True, "space_after": 5},
           {"t": "Questions welcome.", "pt": 11, "color": OK, "space_after": 10},
           {"t": "RetainIQ — from a churn probability to a prioritised, explained, costed "
                 "retention action.", "pt": 10.4, "color": MUTED, "space_after": 0,
            "spacing": 1.18}])
 
-    signal_meter(s, 11.05, 5.62, filled=5, scale=0.85, label=None, color=OK)
-    text(s, M, y + 3.80, CW, 0.40,
+    signal_meter(s, 11.05, r_pan[0] + r_pan[1] - 1.30, filled=5, scale=0.85,
+                 label=None, color=OK)
+    text(s, M, r_credit[0], CW, r_credit[1],
          [{"t": "Logesh S.  ·  B.Sc. Data Science  ·  RetainIQ Signal Ops Console  ·  "
                 "80.34% accuracy  ·  84.91% ROC-AUC",
            "pt": 10.5, "color": MUTED, "mono": True, "space_after": 0}])
@@ -1177,26 +1281,28 @@ LIKELY QUESTIONS
         ("Random Forest", "78.99%", "62.34%", "52.67%", "57.10%", "83.48%", False),
     ]
     colw = [4.35, 1.56, 1.56, 1.42, 1.42, 1.79]
-    yy = y + 0.20
+    _r = stack([(3.70, 0.16), (1.28, 0)]); r_tbl, r_txt = _r[0], _r[1]
+    row_h = (r_tbl[1] - 0.06) / 5
+    yy = r_tbl[0]
     for ri, row in enumerate(rows):
         x = M
         hdr = row[-1]
         for ci, cell in enumerate(row[:-1]):
             if ri == 0:
-                rect(s, x, yy, colw[ci], 0.50, fill=PANEL_2, edge=LINE)
+                rect(s, x, yy, colw[ci], row_h, fill=PANEL_2, edge=LINE)
             elif ri == 1:
-                rect(s, x, yy, colw[ci], 0.54, fill=PANEL, edge=OK, edge_w=1.2)
+                rect(s, x, yy, colw[ci], row_h, fill=PANEL, edge=OK, edge_w=1.2)
             else:
-                rect(s, x, yy, colw[ci], 0.54, fill=PANEL, edge=LINE)
+                rect(s, x, yy, colw[ci], row_h, fill=PANEL, edge=LINE)
             color = MUTED if hdr else (OK if ri == 1 and ci > 0 else TEXT)
-            text(s, x + 0.14, yy + 0.13, colw[ci] - 0.24, 0.32,
-                 [{"t": cell, "pt": 11 if not hdr else 10.2, "color": color,
+            text(s, x + 0.14, yy + (row_h - 0.32) / 2, colw[ci] - 0.24, 0.32,
+                 [{"t": cell, "pt": 11.5 if not hdr else 10.5, "color": color,
                    "bold": hdr or (ri == 1 and ci == 0), "space_after": 0,
                    "mono": hdr or ci > 0}], audit=False)
             x += colw[ci]
-        yy += 0.60
+        yy += row_h + 0.015
 
-    text(s, M, yy + 0.34, CW, 1.4,
+    text(s, M, r_txt[0], CW, r_txt[1],
          [{"t": "All four models were trained on the identical 5,634-row training split "
                 "with the identical 30-feature frame, and evaluated with the same scoring "
                 "code — the only variable is the algorithm.", "pt": 11, "color": MUTED,
@@ -1221,19 +1327,21 @@ LIKELY QUESTIONS
         ("XGBoost", "XGBClassifier(random_state=42) — library defaults otherwise"),
         ("LightGBM", "LGBMClassifier(random_state=42) — library defaults otherwise"),
     ]
-    yy = y + 0.20
+    _r = stack([(3.30, 0.16), (1.68, 0)]); r_tbl, r_call = _r[0], _r[1]
+    row_h = (r_tbl[1] - 0.05) / 5
+    yy = r_tbl[0]
     for ri, (a, b) in enumerate(rows):
         hdr = ri == 0
-        rect(s, M, yy, 3.60, 0.54, fill=PANEL_2 if hdr else PANEL, edge=LINE)
-        rect(s, M + 3.60, yy, 8.49, 0.54, fill=PANEL_2 if hdr else PANEL, edge=LINE)
-        text(s, M + 0.16, yy + 0.15, 3.35, 0.30,
+        rect(s, M, yy, 3.60, row_h, fill=PANEL_2 if hdr else PANEL, edge=LINE)
+        rect(s, M + 3.60, yy, 8.49, row_h, fill=PANEL_2 if hdr else PANEL, edge=LINE)
+        text(s, M + 0.16, yy + (row_h - 0.30) / 2, 3.35, 0.30,
              [{"t": a, "pt": 10.8, "color": MUTED if hdr else TEXT, "bold": hdr,
                "space_after": 0}], audit=False)
-        text(s, M + 3.76, yy + 0.15, 8.20, 0.30,
-             [{"t": b, "pt": 10.2, "color": MUTED if hdr else OK, "mono": not hdr,
+        text(s, M + 3.76, yy + (row_h - 0.30) / 2, 8.20, 0.30,
+             [{"t": b, "pt": 10.4, "color": MUTED if hdr else OK, "mono": not hdr,
                "bold": hdr, "space_after": 0}], audit=False)
-        yy += 0.62
-    callout(s, M, yy + 0.20, CW, 1.30, "A NOTE ON TUNING",
+        yy += row_h + 0.012
+    callout(s, M, r_call[0], CW, r_call[1], "A NOTE ON TUNING",
             "No automated hyperparameter search was run — the algorithms were compared "
             "under their default configurations, which keeps the benchmark a fair test of "
             "the algorithms rather than of how much tuning effort each received. The "
@@ -1259,9 +1367,9 @@ LIKELY QUESTIONS
         blocks = []
         start = col_i * half + 1
         for k, feat in enumerate(chunk):
-            blocks.append({"t": f"{start + k:>2d}.  {feat}", "pt": 9.4, "color": TEXT,
-                           "mono": True, "space_after": 1.2})
-        text(s, x, y + 0.10, CW / 2 - 0.10, 4.4, blocks)
+            blocks.append({"t": f"{start + k:>2d}.  {feat}", "pt": 11.5, "color": TEXT,
+                           "mono": True, "space_after": 8.5})
+        text(s, x, CONTENT_TOP, CW / 2 - 0.10, CAV, blocks)
     footer(s, n, complete_through=len(PHASES), label="Appendix · use only if asked")
     notes(s, "Backup slide. Any question about which variables the model sees can be "
              "answered by pointing here.")
@@ -1272,17 +1380,22 @@ LIKELY QUESTIONS
     eyebrow(s, "APPENDIX", color=MUTED)
     y = heading(s, "Prediction API & where every figure came from",
                 "The same engine, exposed programmatically — and the provenance of this deck")
-    rect(s, M, y + 0.04, 5.30, 2.42, fill=PANEL_2, edge=LINE)
-    text(s, M + 0.20, y + 0.18, 4.90, 2.14,
+    _r = stack([(3.06, 0.16), (1.92, 0)]); r_top, r_call = _r[0], _r[1]
+    rect(s, M, r_top[0], 5.30, r_top[1], fill=PANEL_2, edge=LINE)
+    text(s, M + 0.20, r_top[0] + 0.18, 4.90, r_top[1] - 0.36,
          [{"t": "POST /api/predict", "pt": 11, "color": OK, "bold": True, "mono": True,
            "space_after": 7},
           {"t": "{ \"gender\": \"Male\", \"SeniorCitizen\": 1,", "pt": 9.6, "color": TEXT, "space_after": 1, "mono": True},
           {"t": "  \"tenure\": 8, \"Contract\": \"Month-to-month\",", "pt": 9.6, "color": TEXT, "space_after": 1, "mono": True},
           {"t": "  \"InternetService\": \"Fiber optic\", ... }", "pt": 9.6, "color": TEXT, "space_after": 9, "mono": True},
           {"t": "→  probability · prediction · risk_level", "pt": 9.8, "color": OK, "space_after": 1, "mono": True},
-          {"t": "→  top_drivers · recommendations", "pt": 9.8, "color": OK, "space_after": 0, "mono": True}])
-    rect(s, 6.12, y + 0.04, 6.59, 2.42, fill=PANEL, edge=LINE)
-    text(s, 6.32, y + 0.18, 6.19, 2.14,
+          {"t": "→  top_drivers · recommendations", "pt": 9.8, "color": OK,
+           "space_after": 12, "mono": True},
+          {"t": "GET /api/health  →  the uptime probe the host checks before it "
+                "routes traffic", "pt": 9.8, "color": MUTED, "space_after": 0,
+           "mono": True}])
+    rect(s, 6.12, r_top[0], 6.59, r_top[1], fill=PANEL, edge=LINE)
+    text(s, 6.32, r_top[0] + 0.18, 6.19, r_top[1] - 0.36,
          [{"t": "FIGURE PROVENANCE", "pt": 11, "color": OK, "bold": True, "mono": True,
            "space_after": 7},
           {"t": "Churn split, contract, internet, tenure  →  Data/01.Telco_customer_churn_Dataset.csv",
@@ -1294,8 +1407,12 @@ LIKELY QUESTIONS
           {"t": "Risk bands, profile, revenue  →  the production scoring pipeline",
            "pt": 9.8, "color": TEXT, "space_after": 4, "spacing": 1.14},
           {"t": "QR codes  →  build_qr.py, decoded back to verify", "pt": 9.8,
+           "color": TEXT, "space_after": 4, "spacing": 1.14},
+          {"t": "Console screenshots  →  templates/images/ from the running app",
+           "pt": 9.8, "color": TEXT, "space_after": 4, "spacing": 1.14},
+          {"t": "Power BI pages  →  Power_BI_dashboard/Screenshots/", "pt": 9.8,
            "color": TEXT, "space_after": 0, "spacing": 1.14}])
-    callout(s, M, y + 2.62, CW, 1.10, "THE POINT",
+    callout(s, M, r_call[0], CW, r_call[1], "THE POINT",
             "Nothing in this deck is hand-typed. build_assets.py recomputes every figure "
             "from the saved artifacts and the production scoring path, so the deck cannot "
             "drift away from the project — retrain a model and the charts and the "
@@ -1303,6 +1420,38 @@ LIKELY QUESTIONS
     footer(s, n, complete_through=len(PHASES), label="Appendix · use only if asked")
     notes(s, "Backup slide for API and reproducibility questions. Strong answer to "
              "'how do we know these numbers are right?'")
+
+    # =========================================================== A5 SYSTEM MAP
+    n += 1
+    s = add_slide(prs)
+    eyebrow(s, "APPENDIX", color=MUTED)
+    y = heading(s, "How the system fits together",
+                "One shared path from raw customer data to the console, the API and the BI layer")
+    _r = stack([(3.60, 0.16), (1.38, 0)]); r_map, r_cards = _r[0], _r[1]
+    image_fit(s, ASSETS / "chart_architecture.png", M, r_map[0], CW, r_map[1])
+    cards = [
+        ("ONE PREPROCESSING PATH", "The notebook pipeline and the app import the same "
+         "transformations, so a score in the console and a metric in this deck come "
+         "from the same 30 features.", ACTION),
+        ("TWO ENTRY POINTS", "The Flask console serves the reviewable UI; the FastAPI "
+         "wrapper serves the same model to any other client. Both load the frozen "
+         "feature list.", OK),
+        ("LAYERS ON TOP", "Risk bands and recommendations are rules over the "
+         "probability, not a second model — which is why they are auditable.", WARN),
+    ]
+    cw = (CW - 2 * 0.22) / 3
+    for i, (title, body, c) in enumerate(cards):
+        x = M + i * (cw + 0.22)
+        rect(s, x, r_cards[0], cw, r_cards[1], fill=PANEL, edge=LINE)
+        bar(s, x, r_cards[0] + 0.14, 0.035, r_cards[1] - 0.28, c)
+        text(s, x + 0.20, r_cards[0] + 0.16, cw - 0.42, r_cards[1] - 0.32,
+             [{"t": title, "pt": 10, "color": c, "bold": True, "mono": True,
+               "space_after": 5},
+              {"t": body, "pt": 10.2, "color": TEXT, "space_after": 0, "spacing": 1.16}])
+    footer(s, n, complete_through=len(PHASES), label="Appendix · use only if asked")
+    notes(s, "Backup slide. Use it if a reviewer asks how the pieces connect, or how "
+             "the notebook work reaches the running app. The answer is one shared "
+             "preprocessing path and a frozen feature contract.")
 
     prs.save(OUT)
     return OUT

@@ -45,3 +45,6 @@ logs/*
 desktop.ini
 .DS_Store
 Thumbs.db
+
+# QA by-products: rasterised deck previews (regenerate with preview_deck.py)
+presentation/preview/

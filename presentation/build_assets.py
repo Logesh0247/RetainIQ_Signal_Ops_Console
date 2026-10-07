@@ -75,10 +75,36 @@ def _strip(ax):
         ax.spines[side].set_color(LINE)
 
 
+def _trim(path, bg=(10, 15, 28), pad=6):
+    """Crop uniform background borders so a chart fills the frame it is given.
+
+    Every chart is drawn on the same opaque ink background, so the outer
+    background margin is pure decoration: on a slide it reads as dead space
+    inside the picture box. Trimming it makes `image_fit` placements fill.
+    """
+    import numpy as np
+    from PIL import Image
+
+    with Image.open(path) as im:
+        rgb = im.convert("RGB")
+        arr = np.asarray(rgb).astype(int)
+    mask = (np.abs(arr - np.array(bg)).sum(axis=2) > 18)
+    rows = np.where(mask.any(axis=1))[0]
+    cols = np.where(mask.any(axis=0))[0]
+    if not len(rows) or not len(cols):
+        return
+    top, bottom = max(0, rows[0] - pad), min(arr.shape[0], rows[-1] + 1 + pad)
+    left, right = max(0, cols[0] - pad), min(arr.shape[1], cols[-1] + 1 + pad)
+    if (top, bottom, left, right) == (0, arr.shape[0], 0, arr.shape[1]):
+        return
+    rgb.crop((left, top, right, bottom)).save(path)
+
+
 def _save(fig, name):
     path = ASSETS / name
     fig.savefig(path, dpi=200, transparent=False, bbox_inches="tight", pad_inches=0.15)
     plt.close(fig)
+    _trim(path)
     print("wrote", path.relative_to(ROOT))
 
 
@@ -156,11 +182,9 @@ def chart_churn_split(truth: pd.DataFrame):
         [churn, total - churn], startangle=90, counterclock=False,
         colors=[BAD, PANEL_2], wedgeprops=dict(width=0.34, edgecolor=INK, linewidth=2),
     )
-    ax.text(0, 0.10, f"{rate:.2f}%", ha="center", va="center", fontsize=30,
+    ax.text(0, 0.10, f"{rate:.2f}%", ha="center", va="center", fontsize=24,
             fontweight="bold", color=BAD)
     ax.text(0, -0.22, "churned", ha="center", va="center", fontsize=12, color=MUTED)
-    ax.text(0, -1.42, f"{churn:,} churned   ·   {total - churn:,} retained   ·   {total:,} total",
-            ha="center", va="center", fontsize=11, color=MUTED)
     _save(fig, "chart_churn_split.png")
 
 
@@ -630,12 +654,16 @@ def chart_cv(stability: dict):
     ax.axhline(mean, color=OK, linewidth=2.0, linestyle="-")
     ax.axhspan(mean - stability["f1_std"], mean + stability["f1_std"], color=OK, alpha=0.12)
     ax.axhline(stability["deployed_f1"], color=BAD, linewidth=2.0, linestyle=":")
-    ax.text(len(folds) + 0.12, stability["deployed_f1"],
-            f"  deployed 60.60%", color=BAD, va="center", fontsize=10.5, fontweight="bold")
-    ax.text(0.85, mean + 0.5, f"CV mean {mean:.2f}%", color=OK, fontsize=10.5,
-            fontweight="bold")
+    box = dict(boxstyle="round,pad=0.25", facecolor=INK, edgecolor="none", alpha=0.9)
+    ax.text(len(folds) + 0.30, stability["deployed_f1"] - 1.5, "deployed 60.60%",
+            color=BAD, va="top", ha="right", fontsize=10.5, fontweight="bold", bbox=box)
+    ax.text(0.62, mean + 0.35, f"CV mean {mean:.2f}%", color=OK, va="bottom", ha="left",
+            fontsize=10.5, fontweight="bold", bbox=box)
     for x, v in zip(xs, folds):
-        ax.text(x, v + 0.9, f"{v:.1f}", ha="center", color=TEXT, fontsize=9.5)
+        below = abs(v - stability["deployed_f1"]) < 2.0 or abs(v - mean) < 1.6
+        ax.text(x, v - 0.9 if below else v + 0.9, f"{v:.1f}", ha="center",
+                va="top" if below else "bottom", color=TEXT, fontsize=10,
+                bbox=box if below else None)
     ax.set_xticks(xs, [f"fold {i}" for i in xs])
     ax.set_xlim(0.5, len(folds) + 1.55)
     ax.set_ylim(min(folds) - 4, max(folds) + 3)
@@ -650,9 +678,9 @@ def chart_cv(stability: dict):
 
 def chart_cycle():
     """The 14-phase development cycle, grouped into the deck's three acts."""
-    fig, ax = plt.subplots(figsize=(11.8, 5.0))
+    fig, ax = plt.subplots(figsize=(13.0, 4.5))
     ax.set_xlim(0, 100)
-    ax.set_ylim(0, 54)
+    ax.set_ylim(0, 48)
     ax.axis("off")
     ax.grid(False)
 
@@ -669,18 +697,18 @@ def chart_cycle():
 
     pad = 2.0
     usable = 100 - pad * 2
-    box_h = 10.5
-    label_gap = 1.8
+    box_h = 9.0
+    label_gap = 1.6
 
     # explicit vertical layout: label line, then the row of boxes, then a gap
-    tops = [50.5, 33.5, 16.5]
+    tops = [44.5, 29.5, 14.5]
 
     for (act, arc_name, color, phases), top in zip(arcs, tops):
         y = top - box_h
-        ax.text(pad, top + 0.4, act, color=color, fontsize=10.5, fontweight="bold",
-                va="bottom")
-        ax.text(100 - pad, top + 0.4, arc_name, color=MUTED, fontsize=9.5,
-                va="bottom", ha="right", fontweight="bold")
+        ax.text(pad, top - box_h - 0.30, act, color=color, fontsize=11, fontweight="bold",
+                va="top")
+        ax.text(100 - pad, top - box_h - 0.30, arc_name, color=MUTED, fontsize=10,
+                va="top", ha="right", fontweight="bold")
 
         n = len(phases)
         arrow_w = 1.6
@@ -692,7 +720,7 @@ def chart_cycle():
                 boxstyle="round,pad=0.3,rounding_size=1.0",
                 linewidth=1.5, edgecolor=color, facecolor=PANEL))
             ax.text(x + box_w / 2, y + box_h / 2, label, ha="center", va="center",
-                    color=TEXT, fontsize=9.4, linespacing=1.35)
+                    color=TEXT, fontsize=10.0, linespacing=1.35)
             if i < n - 1:
                 ax.add_patch(FancyArrowPatch(
                     (x + box_w + 0.30, y + box_h / 2),

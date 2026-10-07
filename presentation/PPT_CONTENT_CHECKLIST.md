@@ -2,9 +2,12 @@
 
 Every detail the deck must contain, with the verified value for each.
 
-Status: ✅ = already in `RetainIQ_Project_Review.pptx` (24 slides: 20 content in
-three acts + 4 appendix slides, with the 14-phase progress rail on every content
-slide).
+Status: ✅ = already in `RetainIQ_Project_Review.pptx` (25 slides: 20 content in
+three acts + 5 appendix slides, with the 14-phase progress rail on every content
+slide). Every content slide is laid out on the vertical fill engine in
+`presentation/build_deck.py` — kicker/heading → content band (1.66in–6.80in) →
+rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
+`audit_layout.py` (dead space) and `preview_deck.py` (rasterised renders).
 
 ---
 
@@ -171,7 +174,8 @@ Additional content it carries:
 ## Presentation mechanics (not slide content, but required)
 
 - ✅ Speaker notes on every slide with timings totalling ~10 minutes
-- ✅ Backup slides: full benchmark table, prediction API, reproducibility map
+- ✅ Backup slides: full benchmark table, hyperparameters, the 30 inputs,
+  prediction API + figure provenance, system architecture map
 - ✅ Section numbering and slide numbers
 - ✅ Consistent dark "Signal Ops" theme matching the live product
 
