@@ -122,13 +122,19 @@ Status: ✅ = already in `RetainIQ_Project_Review.pptx`
 - ✅ Deployment: Gunicorn (gthread, 300s timeout, preload, worker recycling), Docker, Procfile, Render
 - ✅ Reproducibility: one script regenerates every chart and metric
 
-## 15. Technology stack (slide 14)
+## 15. Technology stack — REQUIRED CONTENT, not yet in the deck
 
-- ✅ **Language & data:** Python 3.11 · Pandas · NumPy · SQL Server · SQLAlchemy
-- ✅ **Machine learning:** Scikit-learn · Logistic Regression (deployed) · Random Forest · XGBoost · LightGBM · Joblib · SHAP
-- ✅ **Web application:** Flask · Jinja2 · HTML5 · CSS3 · vanilla JavaScript · Gunicorn
-- ✅ **APIs & delivery:** FastAPI + Pydantic · Docker · Render · Git/GitHub · Power BI (.pbix/.pbit)
-- ✅ The reason the stack hangs together: one shared Python package for preprocessing + scoring
+The deck was reverted to its 17-slide state, so this slide is **not built right now**.
+It is a stated requirement and will be rebuilt in the next version (planned position:
+immediately after Business Understanding).
+
+Content it must carry:
+
+- **Language & data:** Python 3.11 · Pandas · NumPy · SQL Server · SQLAlchemy
+- **Machine learning:** Scikit-learn · Logistic Regression (deployed) · Random Forest · XGBoost · LightGBM · Joblib · SHAP
+- **Web application:** Flask · Jinja2 · HTML5 · CSS3 · vanilla JavaScript · Gunicorn
+- **APIs & delivery:** FastAPI + Pydantic · Docker · Render · Git/GitHub · Power BI (.pbix/.pbit)
+- The reason the stack hangs together: one shared Python package for preprocessing + scoring
 - ⚠️ **Do not claim Plotly** — it appears in an older README draft but is not imported anywhere in the code
 
 ## 16. Limitations (slide 15) — reviewers probe here
@@ -147,18 +153,21 @@ Status: ✅ = already in `RetainIQ_Project_Review.pptx`
 - ✅ Counterfactual / what-if explanations
 - ✅ CRM integration and A/B testing of offers
 
-## 18. Closing — link + QR (slide 16)
+## 18. Closing — link + QR — REQUIRED CONTENT, not yet in the deck
 
-- ✅ Live application URL printed in full: `retainiq-predictive-customer-retention-zq6x.onrender.com`
-- ✅ **QR code for the live app** (verified by decoding the rendered PNG)
-- ✅ **QR code for the repository** as a secondary code
-- ✅ Contribution statement: classification score → retention intelligence workflow
-- ✅ Thank-you / questions prompt
-- ✅ Presenter credit line with headline metrics
-- ✅ Notes tell the presenter to offer a live demo from this slide
+Also reverted out of the current deck. Must be rebuilt at the **very end** of the next
+version. The generator (`presentation/build_qr.py`) and both QR images were removed with
+the revert but are recoverable from commit `6465206`.
 
-QR codes live in `presentation/assets/` (`qr_live_app.png`, `qr_repository.png`) and are
-regenerated + verified by `python presentation/build_qr.py`.
+Content it must carry:
+
+- Live application URL printed in full: `retainiq-predictive-customer-retention-zq6x.onrender.com`
+- **QR code for the live app** (must be verified by decoding the rendered PNG)
+- QR code for the repository as a secondary code
+- Contribution statement: classification score → retention intelligence workflow
+- Thank-you / questions prompt
+- Presenter credit line with headline metrics
+- Notes telling the presenter to offer a live demo from this slide
 
 ---
 
