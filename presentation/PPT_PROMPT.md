@@ -14,7 +14,7 @@ narrative momentum, pixel-accurate alignment, and factual integrity.
 
 ## TASK
 
-Create a **20-slide 16:9 presentation** about **RetainIQ — Signal Ops Console**, an
+Create a **21-slide 16:9 presentation** about **RetainIQ — Signal Ops Console**, an
 explainable machine learning platform for customer churn prediction, risk intelligence
 and retention strategy.
 
@@ -39,7 +39,7 @@ reason, a recommended action, and the money it protects.
   Four algorithms, a measurement of how stable the result is, a deliberate choice of
   operating point, then the two questions that make predictions usable: *why* this
   customer, and *how urgent* is it.
-- **ACT III — THE SIGNAL RECOVERED (slides 15–20).** What the intelligence is worth, the
+- **ACT III — THE SIGNAL RECOVERED (slides 15–21).** What the intelligence is worth, the
   product that delivers it, the stack that carries it, the honest limits, and a closing
   return to the opening image — the signal, now read in time.
 
@@ -132,7 +132,7 @@ Rules:
 
 ---
 
-# 3. SLIDE-BY-SLIDE STRUCTURE (20 slides)
+# 3. SLIDE-BY-SLIDE STRUCTURE (21 slides)
 
 **Slide 1 — Title.** `RetainIQ` in large Space Grotesk, `Signal Ops Console` beneath it in
 signal green. Subtitle: "An explainable machine learning platform for customer churn
@@ -264,11 +264,15 @@ customer is expensive — which is the economic reason the operating threshold i
 decision, not a technical default. Close by looping back to Phase 02: drift detection and
 scheduled retraining begin the next cycle.
 
-**Slide 20 — Thank you.** The live application URL in full
-(`retainiq-predictive-customer-retention-zq6x.onrender.com`) with a **large scannable QR
-code** for it, a secondary QR for the repository, the contribution line — *"from a churn
-probability to a prioritised, explained, costed retention action"* — and a questions
-invitation. Return the signal-strength meter motif at full strength here.
+**Slide 20 — See it running: demo and project links.** Keep the live application URL in
+full (`retainiq-predictive-customer-retention-zq6x.onrender.com`), the live-app QR, the
+repository link and its secondary QR. Invite the audience to explore the running app and
+source. Keep the project takeaway, presenter credit and headline metrics on this
+resources/demo slide.
+
+**Slide 21 — Thank You.** A separate final slide with a clear **Thank You** heading and
+**Questions & discussion** invitation, the closing project message, presenter credit,
+headline metrics and a full-strength signal meter. Do not repeat the QR/resource panel.
 
 ---
 
@@ -303,15 +307,7 @@ these is worse than a bland slide.
 
 # 6. DELIVERABLE
 
-A 20-slide 16:9 deck, plus 4 appendix slides after it:
-
-- **A1** — Full benchmark table (all four models, all five metrics).
-- **A2** — Hyperparameters: Logistic Regression `C=1.0, max_iter=5000, solver=lbfgs` ·
-  Random Forest `n_estimators=200` · LightGBM `learning_rate=0.1, n_estimators=100,
-  num_leaves=31`.
-- **A3** — The 30 feature names, grouped.
-- **A4** — Prediction API (`POST /api/predict` request and response shape) and a
-  reproducibility map showing which repository artifact produced each figure in the deck.
+A **21-slide 16:9 presentation**, ending on a separate Thank You slide. Do not add appendix slides to this presentation.
 
 Deliver the deck as an editable file, with speaker notes embedded, and confirm for each
 slide that the alignment grid, the margin, and the 14-phase progress rail are consistent.

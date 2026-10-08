@@ -2,8 +2,8 @@
 
 Every detail the deck must contain, with the verified value for each.
 
-Status: ✅ = already in `RetainIQ_Project_Review.pptx` (20 presentation slides:
-the original review deck, with the original final five appendix pages omitted.
+Status: ✅ = already in `RetainIQ_Project_Review.pptx` (21 presentation slides:
+the original review deck, with a separate final Thank You slide added. The original
 Business Understanding remains slide 3 and Data Collection is slide 4. Every
 slide is laid out on the vertical fill engine in
 `presentation/build_deck.py` — kicker/heading → content band (1.66in–6.80in) →
@@ -157,27 +157,31 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Counterfactual / what-if explanations
 - ✅ CRM integration and A/B testing of offers
 
-## 18. Closing — link + QR (slide 20)
+## 18. Live demo & project links (slide 20)
 
-- ✅ Built: clickable live-app URL, verified live-app QR, clickable repository URL,
-  repository QR, contribution line, questions prompt
+- ✅ Clickable live-app URL, verified live-app QR, clickable repository URL and repository QR
+- ✅ Live scoring workflow, project takeaway and presenter credit with headline metrics
+- ✅ Speaker notes invite a live demo and remind the presenter to warm the free-tier host
 
 Additional content it carries:
 
 - Live application URL printed in full: `retainiq-predictive-customer-retention-zq6x.onrender.com`
-- **QR code for the live app** (must be verified by decoding the rendered PNG)
-- QR code for the repository as a secondary code
-- Contribution statement: classification score → retention intelligence workflow
-- Thank-you / questions prompt
-- Presenter credit line with headline metrics
-- Notes telling the presenter to offer a live demo from this slide
+- **QR code for the live app** and secondary QR for the repository
+- Project takeaway: probability → prioritised, explained and costed retention action
+
+## 19. Thank You — dedicated final slide (slide 21)
+
+- ✅ Standalone final slide after the demo/resources slide
+- ✅ Clear **Thank You** heading and “Questions & discussion” invitation
+- ✅ Closing project message, presenter credit and headline metrics
+- ✅ Full-strength signal-meter motif; no repeated QR/resource panel
 
 ---
 
 ## Presentation mechanics (not slide content, but required)
 
 - ✅ Speaker notes on every slide with timings totalling about 11 minutes 30 seconds
-- ✅ 20 presentation slides: Business Understanding remains on slide 3, Data Collection is slide 4, and the original closing slide is retained at 20.
+- ✅ 21 presentation slides: Business Understanding remains on slide 3, Data Collection is slide 4, demo/resources remain at slide 20, and a separate Thank You slide closes at 21.
 - ✅ Section numbering and slide numbers
 - ✅ Consistent dark "Signal Ops" theme matching the live product
 

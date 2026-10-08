@@ -1269,11 +1269,11 @@ catches 71.7%. That's the next cycle, which starts back at Phase 02 with drift
 monitoring."
 """)
 
-    # =========================================================== 20 THANK YOU
+    # =========================================================== 20 LIVE DEMO & LINKS
     n += 1
     s = add_slide(prs)
     bar(s, 0, 0, SW, 0.085, OK)
-    eyebrow(s, "THANK YOU")
+    eyebrow(s, "LIVE DEMO & PROJECT LINKS")
     y = heading(s, "See it running",
                 "Scan to open the live application and score a customer portfolio")
     _r = stack([(4.34, 0.20), (0.60, 0)]); r_pan, r_credit = _r[0], _r[1]
@@ -1315,11 +1315,12 @@ monitoring."
           {"t": "REPO", "pt": 8.5, "color": MUTED, "bold": True, "mono": True,
            "space_after": 0}], audit=False)
     text(s, 9.82, r_pan[0] + 1.62, 2.69, 2.40,
-         [{"t": "Thank you", "pt": 19, "color": TEXT, "bold": True, "space_after": 5},
-          {"t": "Questions welcome.", "pt": 11, "color": OK, "space_after": 10},
-          {"t": "RetainIQ — from a churn probability to a prioritised, explained, costed "
-                "retention action.", "pt": 10.4, "color": MUTED, "space_after": 0,
-           "spacing": 1.18}])
+         [{"t": "PROJECT TAKEAWAY", "pt": 9.5, "color": OK, "bold": True,
+           "mono": True, "space_after": 7},
+          {"t": "Probability → action", "pt": 17, "color": TEXT, "bold": True,
+           "space_after": 7},
+          {"t": "From churn risk to a prioritised, explained and costed retention response.",
+           "pt": 10.4, "color": MUTED, "space_after": 0, "spacing": 1.18}])
 
     signal_meter(s, 11.05, r_pan[0] + r_pan[1] - 1.30, filled=5, scale=0.85,
                  label=None, color=OK)
@@ -1328,26 +1329,63 @@ monitoring."
                 "80.34% accuracy  ·  84.91% ROC-AUC",
            "pt": 10.5, "color": MUTED, "mono": True, "space_after": 0}])
     notes(s, """
-CLOSING (11:05–11:30) Leave this slide up for questions. It puts the live URL and
-a scannable QR in front of the examiner and ends on the thesis, not a tool list.
-"The contribution isn't the 80% — it's that a probability becomes a prioritised,
-explained, costed action, in a product a retention team can actually open. Thank
-you — happy to take questions."
+LIVE DEMO / LINKS (11:05–11:20) Use this slide to hand off from the review to the
+working product. The live URL is clickable and also available as a QR code; the
+source repository has its own QR and link. The same scoring path powers the model,
+risk bands, coefficient explanations and recommendations shown throughout the deck.
 Offer the demo: "if you'd like, I can upload a customer file and score it live."
-Remember the free tier sleeps — warm the app before you present.
+The host is a free tier, so warm it before the presentation.
+""")
+
+    # =========================================================== 21 THANK YOU
+    n += 1
+    s = add_slide(prs)
+    bar(s, 0, 0, SW, 0.085, OK)
+    rect(s, M, 1.66, CW, 4.98, fill=PANEL, edge=LINE)
+    bar(s, M, 1.66, CW, 0.035, OK)
+    text(s, M + 0.50, 1.94, CW - 1.00, 0.26,
+         [{"t": "RETAINIQ · SIGNAL OPS CONSOLE", "pt": 10, "color": OK,
+           "bold": True, "mono": True, "space_after": 0,
+           "align": PP_ALIGN.CENTER}])
+    signal_meter(s, 6.18, 2.36, filled=5, scale=1.05, label=None, color=OK)
+    text(s, M + 0.50, 3.30, CW - 1.00, 0.84,
+         [{"t": "Thank You", "pt": 42, "color": TEXT, "bold": True,
+           "space_after": 0, "align": PP_ALIGN.CENTER}])
+    text(s, M + 0.50, 4.25, CW - 1.00, 0.34,
+         [{"t": "Questions & discussion", "pt": 16, "color": OK,
+           "space_after": 0, "align": PP_ALIGN.CENTER}])
+    bar(s, 4.78, 4.78, 3.77, 0.014, LINE)
+    text(s, M + 0.70, 5.00, CW - 1.40, 0.48,
+         [{"t": "From churn probability to a prioritised, explained and costed "
+                "retention action.", "pt": 14, "color": MUTED, "space_after": 0,
+           "spacing": 1.16, "align": PP_ALIGN.CENTER}])
+    text(s, M + 0.50, 5.74, CW - 1.00, 0.25,
+         [{"t": "LOGESH S.  ·  B.SC. DATA SCIENCE", "pt": 10, "color": ACTION,
+           "bold": True, "mono": True, "space_after": 0,
+           "align": PP_ALIGN.CENTER}])
+    text(s, M + 0.50, 6.08, CW - 1.00, 0.25,
+         [{"t": "80.34% ACCURACY  ·  84.91% ROC-AUC  ·  7,043 CUSTOMERS SCORED  ·  "
+                "$92,539 HIGH-RISK MONTHLY EXPOSURE",
+           "pt": 9.5, "color": MUTED, "mono": True, "space_after": 0,
+           "align": PP_ALIGN.CENTER}])
+    footer(s, n, complete_through=len(PHASES))
+    notes(s, """
+THANK YOU (11:20–11:30) End on this dedicated final slide. "Thank you for your
+time — happy to take questions." Keep the contribution precise: the project turns
+a churn probability into a prioritised, explained and costed retention action.
 
 LIKELY QUESTIONS
 · Why not deep learning? 1,409 test rows and a largely linear signal; the four-way
   benchmark supports the simpler model, and it stays explainable.
 · Why is recall low? The 0.5 threshold is a default. Phase 08 shows 0.35 catches
   71.7%, and balanced class weights reach 77.81% recall at identical ROC-AUC.
-· Isn't revenue-at-risk optimistic? It's exposure, not savings — the deck and the
-  app both say so; validating it needs a live campaign.
+· Isn't revenue-at-risk optimistic? It is exposure, not savings; validating it
+  needs a live campaign.
 · How do you know it isn't leakage? Churn Score, Reason, Category and Status are
   post-outcome fields and were dropped before training.
 """)
 
-    # Slide 20 is the final content slide; the five appendix slides are omitted.
+    # Slide 21 is the final presentation slide; the five appendix slides are omitted.
     prs.save(OUT)
     return OUT
 
