@@ -43,7 +43,12 @@ def main():
         for sh in slide.shapes:
             x, y = inches(sh.left), inches(sh.top)
             w, h = inches(sh.width), inches(sh.height)
-            # ignore the background, footer furniture and rail ticks
+            # ignore the background, footer furniture, nav hitboxes and rail ticks
+            nv_sp = getattr(sh._element, "nvSpPr", None)
+            c_nv_pr = getattr(nv_sp, "cNvPr", None) if nv_sp is not None else None
+            name = c_nv_pr.get("name") if c_nv_pr is not None else None
+            if name and name.startswith("Slide navigation "):
+                continue
             if w > SW - 0.1 and h > SH - 0.1:
                 continue
             if abs(y - RAIL) < 0.06 or y > FOOTER_RULE - 0.02:

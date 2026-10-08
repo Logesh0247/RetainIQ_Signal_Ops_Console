@@ -8,6 +8,7 @@ rendered height collides with another text block. Run after build_deck.py.
 from __future__ import annotations
 
 import sys
+from collections import Counter
 from pathlib import Path
 
 from PIL import ImageFont
@@ -71,6 +72,29 @@ def block_metrics(tf, box_w_in, box_h_in):
 def main():
     prs = Presentation(str(DECK))
     problems = []
+    expected_slides = 22
+    if len(prs.slides) != expected_slides:
+        problems.append(f"expected {expected_slides} slides, found {len(prs.slides)}")
+    else:
+        for idx, slide in enumerate(prs.slides, 1):
+            targets = []
+            named_nav = 0
+            for shape in slide.shapes:
+                target = shape.click_action.target_slide
+                if target is not None:
+                    targets.append(target.slide_id)
+                nv_sp = getattr(shape._element, "nvSpPr", None)
+                c_nv_pr = getattr(nv_sp, "cNvPr", None) if nv_sp is not None else None
+                name = c_nv_pr.get("name") if c_nv_pr is not None else None
+                if name and name.startswith("Slide navigation "):
+                    named_nav += 1
+            expected_targets = Counter(s.slide_id for s in prs.slides)
+            expected_targets.update(expected_targets)
+            if Counter(targets) != expected_targets or named_nav != expected_slides:
+                problems.append(
+                    f"slide {idx}: expected {expected_slides} clickable nav dashes "
+                    f"(two links per destination), found {named_nav} named targets "
+                    f"and {len(targets)} internal links")
 
     for idx, slide in enumerate(prs.slides, 1):
         texts = []
@@ -118,6 +142,7 @@ def main():
             print("  -", p)
     else:
         print("clean: no out-of-bounds shapes, no text collisions")
+        print("verified: all 22 footer dashes link to all 22 slides on every slide")
     return 1 if problems else 0
 
 

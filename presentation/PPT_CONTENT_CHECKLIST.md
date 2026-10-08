@@ -193,6 +193,7 @@ Additional content it carries:
 - ✅ Speaker notes on every slide with timings totalling about 11 minutes 55 seconds
 - ✅ 22 presentation slides: Business Understanding remains on slide 3, the project comparison is slide 4, Data Collection is slide 5, demo/resources remain at slide 21, and a separate Thank You slide closes at 22.
 - ✅ Section numbering and slide numbers
+- ✅ 22-segment footer rail on every slide (1–22), with each dash linking directly to its matching slide
 - ✅ Consistent dark "Signal Ops" theme matching the live product
 
 ## Assets that must exist in the repo

@@ -112,10 +112,11 @@ Rules:
   swap the border to green/amber/red at 1.2–1.4px. Never fill a card with a bright colour.
 - **KPI tiles:** a row of equal-width tiles, each with a large mono number (20–26pt, in an
   accent colour) above a small uppercase muted label.
-- **Progress rail:** a thin bar of **14 ticks** along the bottom of every slide, one per
-  development phase. Ticks for completed phases are filled green; the current phase is
-  bright green and slightly taller; future phases are hairline grey. This makes the
-  development cycle visible at all times.
+- **Slide navigation rail:** a thin line of **22 clickable dashes** along the bottom of
+  every slide, from the title slide through the final Thank You slide. Each dash links
+  directly to its matching slide in PowerPoint. Completed slides use subdued teal, the
+  current slide is bright green and slightly taller, and upcoming slides are hairline
+  grey. The slide-2 roadmap explains the navigation.
 - **Whitespace:** leave real breathing room. If a slide feels full, cut content — never
   shrink type below 9.5pt or crowd margins.
 
@@ -321,4 +322,5 @@ these is worse than a bland slide.
 A **22-slide 16:9 presentation**, ending on a separate Thank You slide. Do not add appendix slides to this presentation.
 
 Deliver the deck as an editable file, with speaker notes embedded, and confirm for each
-slide that the alignment grid, the margin, and the 14-phase progress rail are consistent.
+slide that the alignment grid, the margin, and all 22 clickable slide-navigation dashes are
+consistent. Test every dash in slideshow mode, including slide 1 and slide 22.

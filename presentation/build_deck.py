@@ -115,6 +115,10 @@ PHASES = [
     "Retention Intelligence", "Business Intelligence", "Web Application", "Deployment",
 ]
 
+# Every slide gets a 22-dash footer rail. Each dash is a direct internal link.
+NAV_TOTAL_SLIDES = 22
+NAVIGATION_LINKS: list[tuple[object, object, int]] = []
+
 # --- text measurement (conservative proxy for the render fonts) -------------
 _TTF = Path(__import__("matplotlib").__file__).parent / "mpl-data" / "fonts" / "ttf"
 _FONTS = {
@@ -249,24 +253,53 @@ def heading(slide, title, sub=None, title_pt=26):
     return y + 0.16
 
 
-def rail(slide, current=None, complete_through=None):
-    """The 14-phase progress rail: the development cycle made visible."""
-    n = len(PHASES)
-    gap = 0.055
-    tw = (CW - (n - 1) * gap) / n
-    for i in range(n):
-        x = M + i * (tw + gap)
-        if complete_through is not None and i < complete_through:
-            color, hgt, y = OK, 0.048, RAIL_Y
-        elif current is not None and i == current:
-            color, hgt, y = OK, 0.075, RAIL_Y - 0.014
+def rail(slide, current_slide):
+    """A 22-slide segmented progress rail; every dash is a clickable destination."""
+    stride = CW / NAV_TOTAL_SLIDES
+    visible_gap = 0.040
+    hit_top = RAIL_Y - 0.080
+    hit_height = 0.220
+    complete = RGBColor(0x1B, 0x52, 0x4B)
+
+    for i in range(NAV_TOTAL_SLIDES):
+        target_number = i + 1
+        slot_x = M + i * stride
+        dash_w = stride - visible_gap
+        if target_number == current_slide:
+            color, dash_h = OK, 0.084
+        elif target_number < current_slide:
+            color, dash_h = complete, 0.050
         else:
-            color, hgt, y = LINE, 0.048, RAIL_Y
-        bar(slide, x, y, tw, hgt, color)
+            color, dash_h = LINE, 0.050
+        dash_y = RAIL_Y + (0.050 - dash_h) / 2
+        dash = bar(slide, slot_x + visible_gap / 2, dash_y, dash_w, dash_h, color)
+
+        # A transparent, larger hit area makes each narrow dash practical to click.
+        hitbox = slide.shapes.add_textbox(
+            Inches(slot_x), Inches(hit_top), Inches(stride), Inches(hit_height))
+        hitbox.fill.background()
+        hitbox.line.fill.background()
+        c_nv_pr = hitbox._element.nvSpPr.cNvPr
+        c_nv_pr.set("name", f"Slide navigation {target_number:02d}")
+        c_nv_pr.set("descr", f"Click to navigate to slide {target_number:02d} of {NAV_TOTAL_SLIDES}")
+        NAVIGATION_LINKS.append((dash, hitbox, target_number))
+
+
+def wire_navigation(prs):
+    """Attach internal PowerPoint links once all destination slides exist."""
+    if len(prs.slides) != NAV_TOTAL_SLIDES:
+        raise ValueError(f"navigation rail expects {NAV_TOTAL_SLIDES} slides, found {len(prs.slides)}")
+    expected_links = NAV_TOTAL_SLIDES * NAV_TOTAL_SLIDES
+    if len(NAVIGATION_LINKS) != expected_links:
+        raise ValueError(f"expected {expected_links} slide-nav targets, found {len(NAVIGATION_LINKS)}")
+    for dash, hitbox, target_number in NAVIGATION_LINKS:
+        target_slide = prs.slides[target_number - 1]
+        dash.click_action.target_slide = target_slide
+        hitbox.click_action.target_slide = target_slide
 
 
 def footer(slide, number, phase=None, complete_through=None, label="RetainIQ · Signal Ops Console"):
-    rail(slide, current=phase, complete_through=complete_through)
+    rail(slide, current_slide=number)
     bar(slide, M, FOOT_RULE_Y, CW, 0.010, LINE)
     left = label
     if phase is not None:
@@ -369,6 +402,7 @@ def signal_meter(slide, x, y, filled=3, total=5, scale=1.0, label=None, color=OK
 
 # --- deck -------------------------------------------------------------------
 def build():
+    NAVIGATION_LINKS.clear()
     prs = Presentation()
     prs.slide_width = Inches(SW)
     prs.slide_height = Inches(SH)
@@ -409,6 +443,7 @@ def build():
            "mono": True, "space_after": 2, "href": LIVE_URL},
           {"t": f"SOURCE  ↗  {REPO_DISPLAY}", "pt": 9.8, "color": MUTED,
            "mono": True, "space_after": 0, "href": REPO_URL}])
+    footer(s, n)
     notes(s, """
 OPENING (0:00–0:35). "Good morning. A telecom knows it lost a quarter of its
 customers last year. What it cannot tell you is who leaves next month, why, or
@@ -431,8 +466,8 @@ Then move — do not read the tiles.
     _r = stack([(4.38, 0.08), (0.68, 0)]); r_chart, r_cap = _r[0], _r[1]
     image_fit(s, ASSETS / "chart_cycle.png", M, r_chart[0], CW, img_h(ASSETS / "chart_cycle.png", CW))
     callout(s, M, r_cap[0], CW, r_cap[1], "HOW TO READ THE DECK",
-            "Three acts — the signal fades (I), reading the signal (II), the signal "
-            "recovered (III). Every slide names its phase in the footer.", OK)
+            "Click any of the 22 footer dashes to jump to that slide; the bright dash "
+            "marks your current position.", OK)
     footer(s, n)
     notes(s, """
 (0:35–1:05) "Everything I show you maps to one of these fourteen boxes, and the
@@ -441,6 +476,7 @@ Point along the arcs: "Act one, the signal fades — the problem and the data. A
 two, reading the signal — the model work. Act three — what it's worth and the
 product."
 Promise the structure and then keep it. Do not narrate every box.
+Point to the footer rail: each of its 22 dashes is a direct link to that slide.
 """)
 
     # =========================================================== 03 PHASE 01
@@ -1413,6 +1449,7 @@ monitoring."
          [{"t": "Logesh S.  ·  B.Sc. Data Science  ·  RetainIQ Signal Ops Console  ·  "
                 "80.34% accuracy  ·  84.91% ROC-AUC",
            "pt": 10.5, "color": MUTED, "mono": True, "space_after": 0}])
+    footer(s, n, complete_through=len(PHASES))
     notes(s, """
 LIVE DEMO / LINKS (11:30–11:45) Use this slide to hand off from the review to the
 working product. The live URL is clickable and also available as a QR code; the
@@ -1471,6 +1508,7 @@ LIKELY QUESTIONS
 """)
 
     # Slide 22 is the final presentation slide; the five appendix slides are omitted.
+    wire_navigation(prs)
     prs.save(OUT)
     # python-pptx writes a blank white default thumbnail; replace it with the real cover
     # so file browsers and previews show the deck rather than a blank white tile.
