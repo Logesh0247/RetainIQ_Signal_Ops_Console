@@ -31,6 +31,8 @@ from pptx.util import Inches, Pt
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 ASSETS = HERE / "assets"
+IMAGES = ROOT / "templates" / "images"
+PBI = ROOT / "Power_BI_dashboard" / "Screenshots"
 OUT = HERE / "RetainIQ_Project_Review.pptx"
 
 URL_FILE = HERE / "live_url.txt"
@@ -39,6 +41,8 @@ LIVE_URL = (URL_FILE.read_text().strip() if URL_FILE.exists()
 LIVE_URL_DISPLAY = LIVE_URL.replace("https://", "")
 REPO_DISPLAY = "github.com/Logesh0247/RetainIQ_Signal_Ops_Console"
 REPO_URL = "https://github.com/Logesh0247/RetainIQ_Signal_Ops_Console"
+PBIT_URL = ("https://github.com/Logesh0247/RetainIQ_Signal_Ops_Console/blob/main/"
+            "Power_BI_dashboard/dashboard_template.pbit")
 
 # --- palette (static/style.css tokens) --------------------------------------
 INK = RGBColor(0x0A, 0x0F, 0x1C)
@@ -821,7 +825,225 @@ business decision about the cost of a wasted offer versus a lost customer — no
 something I should silently change."
 """)
 
-    # This shorter copy intentionally ends after the operating-point decision.
+    # =========================================================== 12 PHASE 09
+    n += 1
+    s = add_slide(prs)
+    eyebrow(s, "PHASE 09  ·  EXPLAINABILITY")
+    y = heading(s, "Why the model flags a customer",
+                "The profile of the high-risk band, and a per-customer explanation in the app")
+    _l = stack([(4.12, 0.14), (0.88, 0)]); lc, lcap = _l[0], _l[1]
+    cw_ = 8.00
+    image_fit(s, ASSETS / "chart_high_risk_profile.png", M, lc[0], cw_,
+              img_h(ASSETS / "chart_high_risk_profile.png", cw_))
+    px = M + cw_ + 0.29
+    pw = SW - M - px
+    _p = stack([(2.49, 0.16), (2.49, 0)]); p1, p2 = _p[0], _p[1]
+    rect(s, px, p1[0], pw, p1[1], fill=PANEL, edge=LINE)
+    text(s, px + 0.20, p1[0] + 0.16, pw - 0.40, p1[1] - 0.32,
+         [{"t": "PER-CUSTOMER EXPLANATION", "pt": 10.5, "color": OK, "bold": True,
+           "mono": True, "space_after": 6},
+          {"t": "For each prediction the console shows the top drivers, computed as "
+                "coefficient × customer value — the honest linear explanation for a "
+                "logistic model, with human labels like \"Fiber optic internet\" or "
+                "\"Account tenure\".", "pt": 10.6, "color": TEXT, "space_after": 0,
+           "spacing": 1.18}])
+    callout(s, px, p2[0], pw, p2[1], "ON SHAP — STATED PRECISELY",
+            "SHAP was explored during the project; summary, bar, dependence and waterfall "
+            "plots are in the repository. Production explanation is aligned to the "
+            "deployed Logistic Regression instead — accurate for a linear model, and it "
+            "costs nothing at request time.", WARN)
+    footer(s, n, phase=8)
+    notes(s, """
+(7:05–7:40) Left chart: "this is who the high-risk band is — every one of them is
+month-to-month, 91% are on fiber optic, 95% have no online security, and they
+average under ten months of tenure."
+Right: "and for a single customer the app names which of those factors pushed
+this particular score."
+If asked about SHAP: "I ran the SHAP analysis during experimentation; the
+deployed model is linear, so I explain it with coefficients — same information,
+no runtime cost." Do not overclaim here.
+""")
+
+    # =========================================================== 13 PHASE 10
+    n += 1
+    s = add_slide(prs)
+    eyebrow(s, "PHASE 10  ·  RISK SEGMENTATION")
+    y = heading(s, "Turning a probability into a work queue",
+                "Every scored customer lands in one of three operational bands")
+    bands = [("< 30%", "LOW RISK", "4,435 customers", OK),
+             ("30 – 60%", "MEDIUM RISK", "1,473 customers", WARN),
+             ("≥ 60%", "HIGH RISK", "1,135 customers", BAD)]
+    bw = (CW - 2 * 0.24) / 3
+    _r = stack([(1.00, 0.18), (3.96, 0)]); r_band, r_left = _r[0], _r[1]
+    r_panel_top = r_left[0]
+    r_panel_h = r_left[1]
+    for i, (rng, label, count, c) in enumerate(bands):
+        x = M + i * (bw + 0.24)
+        rect(s, x, r_band[0], bw, r_band[1], fill=PANEL, edge=c, edge_w=1.2)
+        text(s, x + 0.22, r_band[0] + 0.16, bw - 0.44, r_band[1] - 0.32,
+             [{"t": f"{rng}   {label}", "pt": 11.5, "color": c, "bold": True,
+               "mono": True, "space_after": 2},
+              {"t": count, "pt": 12.5, "color": TEXT, "space_after": 0}])
+    lw = 7.72
+    image_fit(s, ASSETS / "chart_risk_bands.png", M, r_left[0], lw,
+              img_h(ASSETS / "chart_risk_bands.png", lw))
+    px, pw = 8.62, SW - M - 8.62
+    _p = stack([(2.49, 0.16), (2.49, 0)], top=r_panel_top + 0.06,
+               bottom=r_panel_top + r_panel_h)
+    p1, p2 = _p[0], _p[1]
+    rect(s, px, p1[0], pw, p1[1], fill=PANEL_2, edge=OK, edge_w=1.2)
+    text(s, px + 0.20, p1[0] + 0.16, pw - 0.40, p1[1] - 0.32,
+         [{"t": "VALIDATION", "pt": 10.5, "color": OK, "bold": True, "mono": True,
+           "space_after": 5},
+          {"t": "The bands track reality: actual churn is 9.5% in low risk, 42.0% in "
+                "medium and 73.0% in high risk. The segmentation is not decoration — it "
+                "orders the portfolio correctly.", "pt": 10.6, "color": TEXT,
+           "space_after": 0, "spacing": 1.18}])
+    rect(s, px, p2[0], pw, p2[1], fill=PANEL, edge=BAD, edge_w=1.2)
+    text(s, px + 0.20, p2[0] + 0.16, pw - 0.40, p2[1] - 0.32,
+         [{"t": "THE OPERATIONAL PAYOFF", "pt": 10.5, "color": BAD, "bold": True,
+           "mono": True, "space_after": 5},
+          {"t": "Instead of calling 7,043 customers, the team starts with 1,135 — 16.1% "
+                "of the base, where 73% will actually leave — carrying $92,539 of "
+                "recurring monthly charges.", "pt": 10.6, "color": TEXT, "space_after": 0,
+           "spacing": 1.18}])
+    footer(s, n, phase=9)
+    notes(s, """
+(7:40–8:15) "A probability isn't something a retention agent can act on, so I cut
+it into three bands."
+Then the validation, which is the point of the slide: "I checked the bands against
+the real churn labels. Low risk actually churns 9.5%, medium 42%, high 73%. The
+band is a genuine ordering of risk, not a cosmetic split."
+Close operationally: "the team starts with 1,135 customers instead of 7,043."
+""")
+
+    # =========================================================== 14 PHASE 11
+    n += 1
+    s = add_slide(prs)
+    eyebrow(s, "PHASE 11  ·  RETENTION INTELLIGENCE")
+    y = heading(s, "From risk to action — and to money",
+                "2,608 at-risk customers each received a specific recommendation")
+    _r = stack([(3.34, 0.16), (1.64, 0)]); r_chart, r_call = _r[0], _r[1]
+    image_fit(s, ASSETS / "chart_revenue.png", M, r_chart[0], 7.10,
+              img_h(ASSETS / "chart_revenue.png", 7.10))
+    rect(s, 7.95, CONTENT_TOP, 4.76, CAV, fill=PANEL, edge=LINE)
+    text(s, 8.15, CONTENT_TOP + 0.18, 4.40, CAV - 0.36,
+         [{"t": "RECOMMENDATIONS ISSUED (FULL PORTFOLIO)", "pt": 10.5, "color": OK,
+           "bold": True, "mono": True, "space_after": 7},
+          {"t": "Promote Long-Term Contract            792", "pt": 10.4, "color": TEXT, "space_after": 3, "mono": True},
+          {"t": "5% Discount Offer                            663", "pt": 10.4, "color": TEXT, "space_after": 3, "mono": True},
+          {"t": "Offer 15% Discount                          658", "pt": 10.4, "color": TEXT, "space_after": 3, "mono": True},
+          {"t": "Welcome Retention Package          430", "pt": 10.4, "color": TEXT, "space_after": 3, "mono": True},
+          {"t": "Free Online Security                       45", "pt": 10.4, "color": TEXT, "space_after": 3, "mono": True},
+          {"t": "Switch to Autopay / Check-in          18", "pt": 10.4, "color": TEXT, "space_after": 3, "mono": True},
+          {"t": "Free Premium Support                      2", "pt": 10.4, "color": TEXT, "space_after": 8, "mono": True},
+          {"t": "Driven by each customer's own risk factors — a month-to-month customer "
+                "with no security gets a different offer than a loyal high-value one.",
+           "pt": 10.2, "color": MUTED, "space_after": 0, "spacing": 1.16}])
+    callout(s, M, r_call[0], 7.10, r_call[1], "SPEAK PRECISELY ABOUT THIS NUMBER",
+            "RetainIQ reports monthly revenue at risk — the recurring charges sitting "
+            "inside flagged customers. $92,539/month in high risk, $200,302 including "
+            "medium. It is exposure, not money already saved.", WARN)
+    rect(s, 7.95, r_call[0], 4.76, r_call[1], fill=PANEL, edge=LINE)
+    text(s, 8.15, r_call[0] + 0.16, 4.40, r_call[1] - 0.32,
+         [{"t": "DECISION FRAMEWORK", "pt": 10.5, "color": OK, "bold": True,
+           "mono": True, "space_after": 5},
+          {"t": "Data → insight → prediction → explanation → action → business value. "
+                "The platform deliberately does not stop at step three.", "pt": 10.4,
+           "color": TEXT, "space_after": 0, "spacing": 1.18}])
+    footer(s, n, phase=10)
+    notes(s, """
+(8:15–8:50) "Prediction alone doesn't retain anyone."
+Show the offer list — note the biggest group is a contract-upgrade nudge, which
+follows directly from the Phase 04 finding about month-to-month risk.
+Then be precise about money: "this is monthly revenue at risk — exposure, $92,539
+a month sitting in the high-risk band. I deliberately do not call it savings."
+""")
+
+    # =========================================================== 15 PHASE 12
+    n += 1
+    s = add_slide(prs)
+    eyebrow(s, "PHASE 12  ·  BUSINESS INTELLIGENCE")
+    y = heading(s, "The descriptive layer beneath the predictions",
+                "A four-page Power BI dashboard for the people who fund the retention team")
+    _r = stack([(3.26, 0.12), (1.30, 0.12), (0.34, 0)])
+    r_pbi, r_cards, r_link = _r[0], _r[1], _r[2]
+    for i, src in enumerate(["page1_executive_overview.png.png",
+                             "page3_risk_intelligence.png.png"]):
+        path = PBI / src
+        card_h = r_pbi[1]
+        card_w = min(6.00, img_w(path, card_h - 0.18) + 0.18)
+        x = M + i * 6.30 + (6.00 - card_w) / 2
+        picture_card(s, path, x, r_pbi[0], card_w, card_h)
+    yy = r_cards[0]
+    cards = [
+        ("Executive overview", "Portfolio KPIs, churn rate and revenue in one view for management.", OK),
+        ("Customer insights", "Where churn concentrates — contract, tenure, service mix.", ACTION),
+        ("Risk intelligence", "The scored risk distribution carried into BI.", WARN),
+        ("Retention strategy", "Which actions are recommended, and to how many customers.", BAD),
+    ]
+    cw = (CW - 3 * 0.18) / 4
+    for i, (t, b, c) in enumerate(cards):
+        x = M + i * (cw + 0.18)
+        rect(s, x, yy, cw, r_cards[1], fill=PANEL, edge=LINE)
+        bar(s, x, yy + 0.14, 0.035, r_cards[1] - 0.28, c)
+        text(s, x + 0.20, yy + 0.16, cw - 0.42, r_cards[1] - 0.30,
+             [{"t": t, "pt": 11.5, "color": c, "bold": True, "space_after": 4},
+              {"t": b, "pt": 10.0, "color": TEXT, "space_after": 0, "spacing": 1.16}])
+    rect(s, M, r_link[0], CW, r_link[1], fill=PANEL_2, edge=ACTION, edge_w=1.0)
+    text(s, M + 0.20, r_link[0] + 0.02, CW - 0.40, r_link[1] - 0.04,
+         [{"t": "OPEN THE EDITABLE POWER BI TEMPLATE (.PBIT)  ↗", "pt": 10.5,
+           "color": ACTION, "bold": True, "mono": True, "space_after": 0,
+           "href": PBIT_URL}], anchor=MSO_ANCHOR.MIDDLE, audit=False)
+    footer(s, n, phase=11)
+    notes(s, """
+(8:50–9:15) "The machine learning app answers what is likely to happen. Power BI
+answers what already happened and why — and it's what a non-technical
+stakeholder actually opens."
+Four pages: executive overview, customer insights, risk intelligence, retention
+strategy. One sentence each, don't linger. Point out the underlined .pbit link —
+it opens the reusable report template in the project repository.
+""")
+
+    # =========================================================== 16 PHASE 13
+    n += 1
+    s = add_slide(prs)
+    eyebrow(s, "PHASE 13  ·  WEB APPLICATION")
+    y = heading(s, "The product: a Signal Ops Console",
+                "A working Flask application — bulk scoring, dashboard, private reports")
+    _r = stack([(3.86, 0.16), (1.12, 0)]); r_img, r_strip = _r[0], _r[1]
+    a1 = img_w(IMAGES / "06.prediction_dashboard.png", 1.0)
+    a2 = img_w(IMAGES / "04.Bulk_prediction.png", 1.0)
+    ph = (CW - 0.22) / (a1 + a2)
+    d1 = a1 * ph
+    image_fit(s, IMAGES / "06.prediction_dashboard.png", M, r_img[0], d1, ph)
+    image_fit(s, IMAGES / "04.Bulk_prediction.png", M + d1 + 0.22, r_img[0],
+              a2 * ph, ph)
+
+    rect(s, M, r_strip[0], CW, r_strip[1], fill=PANEL, edge=LINE)
+    text(s, M + 0.24, r_strip[0] + 0.14, CW - 2.72, r_strip[1] - 0.26,
+         [{"t": "WHAT A REVIEWER DOES", "pt": 9.8, "color": OK, "bold": True,
+           "mono": True, "space_after": 4},
+          {"t": "Upload a CSV  →  validate the file before scoring  →  score the whole "
+                "portfolio\nRead churn rate, risk split and revenue at risk  →  drill "
+                "into a customer  →  download a private report",
+           "pt": 10.4, "color": TEXT, "space_after": 0, "spacing": 1.16}])
+    text(s, SW - M - 2.20, r_strip[0] + 0.14, 2.20, 0.34,
+         [{"t": "REPORTS ARE PRIVATE — SCOPED BY SIGNED COOKIE", "pt": 8.4,
+           "color": MUTED, "bold": True, "mono": True, "space_after": 0,
+           "align": PP_ALIGN.RIGHT}], audit=False)
+    footer(s, n, phase=12)
+    notes(s, """
+(9:15–9:45) This is the demo slide. If the live site is warm, switch to it for
+thirty seconds; otherwise walk the screenshots.
+"Upload a portfolio, validate it before scoring, then read churn rate, risk
+distribution and revenue at risk — and drill into any single customer."
+One engineering detail worth a sentence: "reports are scoped to the visitor with
+a signed cookie, so users never see each other's data — that has its own unit
+test."
+""")
+
+    # This shortened version intentionally ends at slide 16.
     prs.save(OUT)
     return OUT
 
