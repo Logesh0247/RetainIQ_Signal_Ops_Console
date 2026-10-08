@@ -3,9 +3,9 @@
 Every detail the deck must contain, with the verified value for each.
 
 Status: ✅ = already in `RetainIQ_Project_Review.pptx` (20 presentation slides: the
-original review deck's final slide and final five appendix pages are omitted, and
-one Power BI vs RetainIQ comparison slide has been added). The business problem
-remains slide 3; the comparison is slide 4, before the dataset on slide 5. Every
+first 20 slides of the original deck, with original appendix pages 21–25 omitted;
+the comparison replaces the business-problem slide at position 3). Data collection
+is slide 4, and the original closing slide with links and QR codes remains slide 20. Every
 slide is laid out on the vertical fill engine in
 `presentation/build_deck.py` — kicker/heading → content band (1.66in–6.80in) →
 rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
@@ -27,16 +27,9 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ The one-line thesis: probability → action, not just a classification score
 - ✅ Four-part structure of the talk
 
-## 3. Business problem (slide 3)
+## 3. Existing project layer vs RetainIQ (slide 3)
 
-- ✅ What churn costs; why dashboards describe but don't prioritise
-- ✅ Why blanket campaigns waste budget
-- ✅ **The four questions:** Who will churn? → Why? → What action? → What's at stake?
-- ✅ Base-rate framing: predicting "nobody churns" is already 73.46% accurate
-
-## 4. Existing project layer vs RetainIQ (slide 4)
-
-- ✅ Placement: after the cycle map and business problem; before dataset collection
+- ✅ Placement: after the cycle map and before dataset collection on slide 4
 - ✅ Power BI: portfolio-level historical churn KPIs and segment patterns
 - ✅ RetainIQ: uploaded customer rows scored with deployed Logistic Regression;
   churn probability, risk tier, coefficient-based drivers, rule-based suggestions,
@@ -44,7 +37,7 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Difference: portfolio monitoring vs customer-level prioritisation
 - ✅ Complementary layers; no campaign uplift measured; revenue remains at-risk exposure
 
-## 5. Dataset (slide 5)
+## 4. Dataset (slide 4)
 
 - ✅ Source: IBM Telco Customer Churn
 - ✅ 7,043 customers · 34 raw features · 30 final ML features
@@ -55,7 +48,7 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ **Leakage control:** dropped Churn Score, Churn Reason, Churn Category, Customer Status
 - ✅ Train/serve parity: 30 columns frozen in `feature_columns.pkl`, unit-tested
 
-## 6. Preprocessing & feature engineering (slides 6 and 8)
+## 5. Preprocessing & feature engineering (slides 5 and 7)
 
 - ✅ Cleaning: dtype fixes, blanks, duplicates, category normalisation
 - ✅ 11 blank TotalCharges, all zero-tenure new customers
@@ -63,7 +56,7 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Removal of ID and geographic columns
 - ✅ Why one shared pipeline matters (notebook and app use the same code)
 
-## 7. EDA findings (slide 7) — pick 3, hold the rest as backup
+## 6. EDA findings (slide 6) — pick 3, hold the rest as backup
 
 - ✅ Contract: month-to-month 42.7% vs one-year 11.3% vs two-year 2.8% (15× gap)
 - ✅ Tenure: 47.4% churn in year one; 55.5% of all churners are in year one
@@ -74,14 +67,14 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Senior citizens: 41.7% vs 23.6%
 - ✅ Missing add-ons: no online security 41.8%, no tech support 41.6%
 
-## 8. Model development (slide 9)
+## 7. Model development (slide 8)
 
 - ✅ Four algorithms: Logistic Regression, Random Forest, XGBoost, LightGBM
 - ✅ Rationale for each (linear baseline / bagging / two boosting implementations)
 - ✅ Same features, same split, same scoring code — only the algorithm differs
 - ✅ Why more than one model (result is a property of the data, not one config)
 
-## 9. Evaluation & model selection (slides 10–12) — the credibility section
+## 8. Evaluation & model selection (slides 9–11) — the credibility section
 
 - ✅ Full benchmark table (held-out 1,409 customers):
 
@@ -97,34 +90,34 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Selection reason: chosen on F1 + ROC-AUC, not accuracy alone
 - ✅ Honest read on recall (56.95% — two in five churners missed)
 
-## 10. Risk segmentation (slide 14)
+## 9. Risk segmentation (slide 13)
 
 - ✅ Thresholds: < 30% low · 30–60% medium · ≥ 60% high
 - ✅ Band sizes: 4,435 low · 1,473 medium · 1,135 high
 - ✅ **Validation against real labels:** actual churn 9.5% / 42.0% / 73.0%
 - ✅ Operational payoff: 1,135 to prioritise instead of 7,043
 
-## 11. Explainability (slide 13)
+## 10. Explainability (slide 12)
 
 - ✅ Per-customer drivers = coefficient × value (honest for a linear model)
 - ✅ High-risk band profile: 100% month-to-month · 95% no online security · 94% no tech support · 91% fiber optic · 80% electronic check · 32% senior · avg tenure 9.6 mo
 - ✅ SHAP status stated precisely: explored in research, production uses coefficients
 
-## 12. Retention intelligence (slide 15)
+## 11. Retention intelligence (slide 14)
 
 - ✅ 2,608 at-risk customers (high + medium) each got a recommendation
 - ✅ Recommendation breakdown: Long-Term Contract 792 · 5% Discount 663 · 15% Discount 658 · Welcome Package 430 · Free Online Security 45 · Autopay 9 · Check-in 9 · Premium Support 2
 - ✅ Rules driven by the customer's own risk factors
 - ✅ Decision framework: Data → Insight → Prediction → Explanation → Action → Value
 
-## 13. Business value / revenue (slide 15)
+## 12. Business value / revenue (slide 14)
 
 - ✅ High-risk monthly revenue at risk: **$92,539**
 - ✅ High + medium: **$200,302**
 - ✅ Entire portfolio: $456,117
 - ✅ Framing: "revenue at risk / exposure" — never "revenue saved"
 
-## 14. Product & demo (slide 17)
+## 13. Product & demo (slide 16)
 
 - ✅ System architecture diagram (data → model → risk/explain/action → console/API/BI)
 - ✅ Flask console modules: Bulk Prediction, Dashboard, Reports, About
@@ -132,16 +125,16 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Screenshots: home, bulk upload, dashboard, reports
 - ✅ Note: single-prediction page was retired (route redirects home)
 
-## 15. Engineering & deployment (slide 18)
+## 14. Engineering & deployment (slide 17)
 
 - ✅ Power BI: 4 pages — executive overview, customer insights, risk intelligence, retention strategy
-- ✅ Clickable `.pbit` template link on slide 16 (GitHub file page)
+- ✅ Clickable `.pbit` template link on slide 15 (GitHub file page)
 - ✅ API: Flask `/api/health`, `/api/predict` + FastAPI wrapper with Pydantic validation
 - ✅ Tests: 9 unit tests (encoding, model load, scoring, risk, recommendations, CSV validation, report privacy)
 - ✅ Deployment: Gunicorn (gthread, 300s timeout, preload, worker recycling), Docker, Procfile, Render
 - ✅ Reproducibility: one script regenerates every chart and metric
 
-## 16. Technology stack (slide 19)
+## 15. Technology stack (slide 18)
 
 - ✅ Built: tool logos in a left-side rail; spacious grouped stack details on the right
 
@@ -152,7 +145,7 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - The reason the stack hangs together: one shared Python package for preprocessing + scoring
 - ⚠️ **Do not claim Plotly** — it appears in an older README draft but is not imported anywhere in the code
 
-## 17. Limitations (slide 20) — reviewers probe here
+## 16. Limitations (slide 19) — reviewers probe here
 
 - ✅ Historical data from one telecom
 - ✅ 56.95% recall — two in five churners missed
@@ -160,7 +153,7 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Probabilities are not guarantees
 - ✅ Revenue is exposure, not realised savings
 
-## 18. Future work (slide 20)
+## 17. Future work (slide 19)
 
 - ✅ Threshold tuning and probability calibration
 - ✅ Cost-sensitive learning
@@ -168,12 +161,27 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Counterfactual / what-if explanations
 - ✅ CRM integration and A/B testing of offers
 
+## 18. Closing — link + QR (slide 20)
+
+- ✅ Built: clickable live-app URL, verified live-app QR, clickable repository URL,
+  repository QR, contribution line, questions prompt
+
+Additional content it carries:
+
+- Live application URL printed in full: `retainiq-predictive-customer-retention-zq6x.onrender.com`
+- **QR code for the live app** (must be verified by decoding the rendered PNG)
+- QR code for the repository as a secondary code
+- Contribution statement: classification score → retention intelligence workflow
+- Thank-you / questions prompt
+- Presenter credit line with headline metrics
+- Notes telling the presenter to offer a live demo from this slide
+
 ---
 
 ## Presentation mechanics (not slide content, but required)
 
-- ✅ Speaker notes on every slide with timings totalling about 11 minutes 40 seconds
-- ✅ 20 presentation slides: the comparison is added as slide 4; the final closing page and original final-five appendix pages are omitted.
+- ✅ Speaker notes on every slide with timings totalling about 11 minutes 30 seconds
+- ✅ 20 presentation slides: comparison at slide 3, dataset at 4, original closing slide at 20; original appendix slides 21–25 are omitted.
 - ✅ Section numbering and slide numbers
 - ✅ Consistent dark "Signal Ops" theme matching the live product
 
