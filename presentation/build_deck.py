@@ -1043,7 +1043,267 @@ a signed cookie, so users never see each other's data — that has its own unit
 test."
 """)
 
-    # This shortened version intentionally ends at slide 16.
+    # =========================================================== 17 PHASE 14
+    n += 1
+    s = add_slide(prs)
+    eyebrow(s, "PHASE 14  ·  DEPLOYMENT")
+    y = heading(s, "Making it survive production",
+                "Free-tier hosting is unforgiving — these are the four problems it creates")
+    problems = [
+        ("Slow scoring on a shared CPU", "A large CSV can take far longer than the default 30-second worker timeout, so the worker is killed mid-request and the browser shows a 502.", "300-second timeout", OK),
+        ("Reloading the model per request", "Reading the pickled model on every request wastes the little memory the instance has.", "worker preload", OK),
+        ("Memory creeping past the limit", "A long-lived worker grows until the platform OOM-kills it, which surfaces as a random error.", "request recycling", OK),
+        ("The free tier sleeps", "An idle instance is suspended, so the first visitor waits for a cold start.", "warm it before demoing", WARN),
+    ]
+    ch = (CW - 0.26) / 2
+    _r = stack([(1.94, 0.16), (1.94, 0.16), (0.94, 0)])
+    r1, r2, r_call = _r[0], _r[1], _r[2]
+    for i, (t, b, fix, c) in enumerate(problems):
+        x = M + (i % 2) * (ch + 0.26)
+        yy, hh = (r1 if i < 2 else r2)
+        rect(s, x, yy, ch, hh, fill=PANEL, edge=LINE)
+        bar(s, x, yy + 0.16, 0.035, hh - 0.32, c)
+        text(s, x + 0.24, yy + 0.18, ch - 0.50, hh - 0.36,
+             [{"t": t, "pt": 12, "color": TEXT, "bold": True, "space_after": 4},
+              {"t": b, "pt": 10.2, "color": MUTED, "space_after": 5, "spacing": 1.16},
+              {"t": f"→ fixed by {fix}", "pt": 10.4, "color": c, "bold": True,
+               "mono": True, "space_after": 0}])
+
+    callout(s, M, r_call[0], CW, r_call[1], "SHIPPED AS",
+            "Gunicorn with a threaded worker · Dockerfile and Procfile · version-pinned "
+            "requirements · hosted on Render, where the application answers at the URL on "
+            "the closing slide.", ACTION)
+    footer(s, n, phase=13)
+    notes(s, """
+(9:45–10:10) Don't list technology here — that's the next slide. This slide is
+about the production problems, which is what actually separates a notebook from
+a deployed service.
+"Four things broke or nearly broke when this left my laptop: slow scoring hitting
+the worker timeout, the model being reloaded per request, memory creeping until
+the platform killed the worker, and the free tier sleeping."
+Then the honest operational note: "which means if you scan the QR at the end, and
+the app has been idle, you'll wait about a minute for it to wake up. I'll warm it
+before we start."
+""")
+
+    # =========================================================== 18 TECH STACK
+    n += 1
+    s = add_slide(prs)
+    eyebrow(s, "TECHNOLOGY STACK")
+    y = heading(s, "Tools behind the RetainIQ workflow",
+                "A shared Python path keeps model training and live scoring in sync")
+
+    logo_dir = ASSETS / "tool_logos"
+    logo_panel_w, logo_gap = 3.10, 0.20
+    logo_x, logo_y = M, CONTENT_TOP
+    rect(s, logo_x, logo_y, logo_panel_w, CAV, fill=PANEL, edge=LINE)
+    text(s, logo_x + 0.16, logo_y + 0.12, logo_panel_w - 0.32, 0.24,
+         [{"t": "TOOLS USED", "pt": 9.8, "color": MUTED, "bold": True,
+           "mono": True, "space_after": 0}], audit=False)
+
+    logo_items = [
+        ("python", "Python"), ("pandas", "Pandas"),
+        ("scikitlearn", "Scikit-learn"), ("flask", "Flask"),
+        ("fastapi", "FastAPI"), ("docker", "Docker"),
+        ("powerbi", "Power BI"), ("github", "GitHub"),
+    ]
+    logo_pad, logo_col_gap = 0.16, 0.12
+    tile_w = (logo_panel_w - 2 * logo_pad - logo_col_gap) / 2
+    tile_h, tile_gap, grid_top = 1.02, 0.08, logo_y + 0.47
+    for i, (icon, label) in enumerate(logo_items):
+        col, row = i % 2, i // 2
+        x = logo_x + logo_pad + col * (tile_w + logo_col_gap)
+        yy = grid_top + row * (tile_h + tile_gap)
+        rect(s, x, yy, tile_w, tile_h, fill=PANEL_2, edge=LINE_SOFT)
+        icon_path = logo_dir / f"{icon}.png"
+        image_fit(s, icon_path, x + (tile_w - 0.42) / 2, yy + 0.09, 0.42, 0.42)
+        text(s, x + 0.05, yy + 0.58, tile_w - 0.10, 0.25,
+             [{"t": label, "pt": 9.2, "color": TEXT, "bold": True,
+               "space_after": 0, "align": PP_ALIGN.CENTER}], audit=False)
+
+    right_x = logo_x + logo_panel_w + logo_gap
+    right_w = SW - M - right_x
+    groups = [
+        ("LANGUAGE & DATA", OK,
+         ["Python 3.11 · Pandas · NumPy · SQL Server · SQLAlchemy"]),
+        ("MACHINE LEARNING", WARN,
+         ["Scikit-learn · Logistic Regression (deployed) · Random Forest",
+          "XGBoost · LightGBM · Joblib · SHAP (research only)"]),
+        ("WEB APPLICATION", ACTION,
+         ["Flask · Jinja2 · HTML5/CSS3 · Vanilla JavaScript · Gunicorn"]),
+        ("API & DELIVERY", BAD,
+         ["FastAPI + Pydantic · Docker · Render · Git/GitHub",
+          "Power BI · .pbix report · .pbit template"]),
+    ]
+    row_gap = 0.14
+    card_h = (CAV - 3 * row_gap) / 4
+    for i, (title, color, details) in enumerate(groups):
+        yy = CONTENT_TOP + i * (card_h + row_gap)
+        rect(s, right_x, yy, right_w, card_h, fill=PANEL, edge=LINE)
+        bar(s, right_x, yy, 0.045, card_h, color)
+        blocks = [{"t": title, "pt": 10.2, "color": color, "bold": True,
+                   "mono": True, "space_after": 5}]
+        blocks += [{"t": line, "pt": 12.7, "color": TEXT,
+                    "space_after": 0, "spacing": 1.18} for line in details]
+        text(s, right_x + 0.22, yy + 0.14, right_w - 0.42, card_h - 0.26,
+             blocks)
+
+    footer(s, n, complete_through=len(PHASES))
+    notes(s, """
+(10:10–10:35) Use the logos as visual anchors; do not read the lists line by line.
+"Python, pandas and NumPy handle the data. Scikit-learn trains the deployed
+Logistic Regression; Flask and FastAPI expose it; Docker, Render and GitHub carry
+it to production; Power BI presents the business view."
+SHAP was explored only in research; the production explanations come from the
+Logistic Regression coefficients. One shared Python package keeps training and
+serving on the same preprocessing and scoring path.
+""")
+
+    # =========================================================== 19 RESPONSIBLE AI
+    n += 1
+    s = add_slide(prs)
+    eyebrow(s, "RESPONSIBLE AI, LIMITS & THE NEXT CYCLE")
+    y = heading(s, "What this model should not be trusted with",
+                "Where it breaks, who it might treat unfairly, and what the next cycle fixes")
+    col = (CW - 2 * 0.26) / 3
+
+    rect(s, M, CONTENT_TOP, col, CAV, fill=PANEL, edge=WARN, edge_w=1.2)
+    text(s, M + 0.22, CONTENT_TOP + 0.18, col - 0.44, CAV - 0.36,
+         [{"t": "LIMITATIONS — STATED PLAINLY", "pt": 11, "color": WARN, "bold": True,
+           "mono": True, "space_after": 7},
+          {"t": "▸  Trained on historical data from one telecom; behaviour may not transfer",
+           "pt": 10.6, "color": TEXT, "space_after": 5, "spacing": 1.16},
+          {"t": "▸  56.95% recall at the deployed threshold — two in five churners missed",
+           "pt": 10.6, "color": TEXT, "space_after": 5, "spacing": 1.16},
+          {"t": "▸  No live behavioural feed, no drift monitoring, no automatic retraining",
+           "pt": 10.6, "color": TEXT, "space_after": 5, "spacing": 1.16},
+          {"t": "▸  Probabilities are not guarantees; recommendations are decision support",
+           "pt": 10.6, "color": TEXT, "space_after": 5, "spacing": 1.16},
+          {"t": "▸  Revenue figures are exposure, not realised savings",
+           "pt": 10.6, "color": TEXT, "space_after": 0, "spacing": 1.16}])
+
+    rect(s, M + col + 0.26, CONTENT_TOP, col, CAV, fill=PANEL, edge=BAD, edge_w=1.2)
+    text(s, M + col + 0.48, CONTENT_TOP + 0.18, col - 0.44, CAV - 0.36,
+         [{"t": "FAIRNESS — AN OPEN QUESTION", "pt": 11, "color": BAD, "bold": True,
+           "mono": True, "space_after": 7},
+          {"t": "▸  Senior citizens churn at 41.7% — nearly double the base rate. A model "
+                "optimising for churn risk will systematically concentrate its retention "
+                "offers on them.", "pt": 10.6, "color": TEXT, "space_after": 5,
+           "spacing": 1.16},
+          {"t": "▸  A blanket discount aimed at that group is not neutral; it can read as "
+                "exploitative pricing.", "pt": 10.6, "color": TEXT, "space_after": 5,
+           "spacing": 1.16},
+          {"t": "▸  No bias audit has been run. Before this touched real customers, that "
+                "would be a prerequisite, not a nice-to-have.", "pt": 10.6, "color": TEXT,
+           "space_after": 0, "spacing": 1.16}])
+
+    rect(s, M + 2 * (col + 0.26), CONTENT_TOP, col, CAV, fill=PANEL, edge=ACTION, edge_w=1.2)
+    text(s, M + 2 * (col + 0.26) + 0.22, CONTENT_TOP + 0.18, col - 0.44, CAV - 0.36,
+         [{"t": "THE NEXT CYCLE", "pt": 11, "color": ACTION, "bold": True, "mono": True,
+           "space_after": 7},
+          {"t": "▸  Move the operating point deliberately — 0.35 catches 71.7% of churners "
+                "at no cost to F1", "pt": 10.6, "color": TEXT, "space_after": 5,
+           "spacing": 1.16},
+          {"t": "▸  Decide the threshold with the business: a wasted offer is cheap, a lost "
+                "customer is not", "pt": 10.6, "color": TEXT, "space_after": 5,
+           "spacing": 1.16},
+          {"t": "▸  Bias audit across age and other protected attributes",
+           "pt": 10.6, "color": TEXT, "space_after": 5, "spacing": 1.16},
+          {"t": "▸  Drift detection and scheduled retraining — which sends the project "
+                "back to Phase 02", "pt": 10.6, "color": TEXT, "space_after": 0,
+           "spacing": 1.16}])
+    footer(s, n, complete_through=len(PHASES))
+    notes(s, """
+(10:35–11:05) Most students hide this slide. Put it up and read it.
+"Three things I would not do with this model today. I wouldn't trust it on a
+different market — it has only ever seen one telecom. I wouldn't quote revenue as
+savings, only as exposure. And I wouldn't ship a retention campaign aimed at
+senior citizens without a bias audit — they churn at 41.7%, nearly double the
+base rate, so a risk-optimising model will concentrate offers on them."
+Then close the loop: "and the fix for the recall number is already measured — 0.35
+catches 71.7%. That's the next cycle, which starts back at Phase 02 with drift
+monitoring."
+""")
+
+    # =========================================================== 20 THANK YOU
+    n += 1
+    s = add_slide(prs)
+    bar(s, 0, 0, SW, 0.085, OK)
+    eyebrow(s, "THANK YOU")
+    y = heading(s, "See it running",
+                "Scan to open the live application and score a customer portfolio")
+    _r = stack([(4.34, 0.20), (0.60, 0)]); r_pan, r_credit = _r[0], _r[1]
+    rect(s, M, r_pan[0], 5.82, r_pan[1], fill=PANEL, edge=OK, edge_w=1.4)
+    text(s, M + 0.28, r_pan[0] + 0.24, 5.26, r_pan[1] - 0.48,
+         [{"t": "LIVE APPLICATION", "pt": 10.5, "color": OK, "bold": True, "mono": True,
+           "space_after": 8},
+          {"t": LIVE_URL_DISPLAY, "pt": 11, "color": ACTION, "bold": True,
+           "space_after": 10, "spacing": 1.16, "href": LIVE_URL},
+          {"t": "Bulk score a customer CSV, read the dashboard, and download a private "
+                "report. The model, risk bands, explanations and recommendations run "
+                "live — the same code paths that produced every figure in this deck.",
+           "pt": 10.8, "color": MUTED, "space_after": 12, "spacing": 1.20},
+          {"t": "SOURCE CODE", "pt": 10.5, "color": ACTION, "bold": True, "mono": True,
+           "space_after": 5},
+          {"t": REPO_DISPLAY, "pt": 10.6, "color": ACTION, "mono": True,
+           "space_after": 12, "spacing": 1.16, "href": REPO_URL},
+          {"t": "Notebooks 01–09, the Flask console, the FastAPI wrapper and the "
+                "nine-test suite are all in the repository.", "pt": 10.4,
+           "color": MUTED, "space_after": 10, "spacing": 1.18},
+          {"t": "The host is a free tier — open it once a minute before the review so "
+                "the first scan is instant.", "pt": 10.4, "color": WARN,
+           "space_after": 0, "spacing": 1.18}])
+
+    rect(s, 6.54, r_pan[0], 2.98, r_pan[1], fill=WHITE, edge=LINE)
+    qs = min(2.86, r_pan[1] - 0.92)
+    image_fit(s, ASSETS / "qr_live_app.png", 6.54 + (2.98 - qs) / 2, r_pan[0] + 0.22, qs, qs)
+    text(s, 6.70, r_pan[0] + r_pan[1] - 0.68, 2.66, 0.52,
+         [{"t": "SCAN FOR THE", "pt": 9.5, "color": INK, "bold": True, "mono": True,
+           "space_after": 2, "align": PP_ALIGN.CENTER},
+          {"t": "LIVE APPLICATION", "pt": 9.5, "color": INK, "bold": True, "mono": True,
+           "space_after": 0, "align": PP_ALIGN.CENTER}])
+
+    rect(s, 9.62, r_pan[0], 3.09, r_pan[1], fill=PANEL, edge=LINE)
+    image_fit(s, ASSETS / "qr_repository.png", 10.54, r_pan[0] + 0.24, 1.25, 1.25)
+    text(s, 9.82, r_pan[0] + 0.28, 0.66, 1.00,
+         [{"t": "SOURCE", "pt": 8.5, "color": MUTED, "bold": True, "mono": True,
+           "space_after": 3},
+          {"t": "REPO", "pt": 8.5, "color": MUTED, "bold": True, "mono": True,
+           "space_after": 0}], audit=False)
+    text(s, 9.82, r_pan[0] + 1.62, 2.69, 2.40,
+         [{"t": "Thank you", "pt": 19, "color": TEXT, "bold": True, "space_after": 5},
+          {"t": "Questions welcome.", "pt": 11, "color": OK, "space_after": 10},
+          {"t": "RetainIQ — from a churn probability to a prioritised, explained, costed "
+                "retention action.", "pt": 10.4, "color": MUTED, "space_after": 0,
+           "spacing": 1.18}])
+
+    signal_meter(s, 11.05, r_pan[0] + r_pan[1] - 1.30, filled=5, scale=0.85,
+                 label=None, color=OK)
+    text(s, M, r_credit[0], CW, r_credit[1],
+         [{"t": "Logesh S.  ·  B.Sc. Data Science  ·  RetainIQ Signal Ops Console  ·  "
+                "80.34% accuracy  ·  84.91% ROC-AUC",
+           "pt": 10.5, "color": MUTED, "mono": True, "space_after": 0}])
+    notes(s, """
+CLOSING (11:05–11:30) Leave this slide up for questions. It puts the live URL and
+a scannable QR in front of the examiner and ends on the thesis, not a tool list.
+"The contribution isn't the 80% — it's that a probability becomes a prioritised,
+explained, costed action, in a product a retention team can actually open. Thank
+you — happy to take questions."
+Offer the demo: "if you'd like, I can upload a customer file and score it live."
+Remember the free tier sleeps — warm the app before you present.
+
+LIKELY QUESTIONS
+· Why not deep learning? 1,409 test rows and a largely linear signal; the four-way
+  benchmark supports the simpler model, and it stays explainable.
+· Why is recall low? The 0.5 threshold is a default. Phase 08 shows 0.35 catches
+  71.7%, and balanced class weights reach 77.81% recall at identical ROC-AUC.
+· Isn't revenue-at-risk optimistic? It's exposure, not savings — the deck and the
+  app both say so; validating it needs a live campaign.
+· How do you know it isn't leakage? Churn Score, Reason, Category and Status are
+  post-outcome fields and were dropped before training.
+""")
+
+    # Slide 20 is the final content slide; the five appendix slides are omitted.
     prs.save(OUT)
     return OUT
 
