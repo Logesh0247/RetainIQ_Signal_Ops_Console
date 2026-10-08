@@ -14,7 +14,7 @@ narrative momentum, pixel-accurate alignment, and factual integrity.
 
 ## TASK
 
-Create a **21-slide 16:9 presentation** about **RetainIQ — Signal Ops Console**, an
+Create a **22-slide 16:9 presentation** about **RetainIQ — Signal Ops Console**, an
 explainable machine learning platform for customer churn prediction, risk intelligence
 and retention strategy.
 
@@ -32,14 +32,14 @@ reason, a recommended action, and the money it protects.
 
 **Three-act structure:**
 
-- **ACT I — THE SIGNAL FADES (slides 1–7).** The business pain. A customer base bleeding
+- **ACT I — THE SIGNAL FADES (slides 1–8).** The business pain. A customer base bleeding
   26.54% of its people. Reports that describe but cannot predict. The data that holds the
   pattern, and the first discoveries that reveal it.
-- **ACT II — READING THE SIGNAL (slides 8–14).** Building and interrogating the model.
+- **ACT II — READING THE SIGNAL (slides 9–15).** Building and interrogating the model.
   Four algorithms, a measurement of how stable the result is, a deliberate choice of
   operating point, then the two questions that make predictions usable: *why* this
   customer, and *how urgent* is it.
-- **ACT III — THE SIGNAL RECOVERED (slides 15–21).** What the intelligence is worth, the
+- **ACT III — THE SIGNAL RECOVERED (slides 16–22).** What the intelligence is worth, the
   product that delivers it, the stack that carries it, the honest limits, and a closing
   return to the opening image — the signal, now read in time.
 
@@ -132,7 +132,7 @@ Rules:
 
 ---
 
-# 3. SLIDE-BY-SLIDE STRUCTURE (21 slides)
+# 3. SLIDE-BY-SLIDE STRUCTURE (22 slides)
 
 **Slide 1 — Title.** `RetainIQ` in large Space Grotesk, `Signal Ops Console` beneath it in
 signal green. Subtitle: "An explainable machine learning platform for customer churn
@@ -153,40 +153,48 @@ but cannot predict; why blanket campaigns waste budget. The four questions the p
 answers: *Who will churn? Why? What should we do? What is at stake?* Close with the base
 rate trap: predicting "nobody churns" is already 73.46% accurate.
 
-**Slide 4 — PHASE 02 · Data Collection.** IBM Telco Customer Churn dataset. KPI tiles:
+**Slide 4 — What RetainIQ adds to the existing project.** Give this its own slide,
+separate from Business Understanding. **Power BI** provides portfolio-level historical
+churn, KPIs and segment patterns. **RetainIQ** scores uploaded customer rows with the
+deployed Logistic Regression, returns churn probabilities and risk tiers, shows
+coefficient-based drivers with rule-based suggestions, and supports bulk review/export.
+Make clear the layers are complementary. Campaign uplift has not been measured; revenue
+figures are exposure, not confirmed savings.
+
+**Slide 5 — PHASE 02 · Data Collection.** IBM Telco Customer Churn dataset. KPI tiles:
 `7,043` customers · `34` raw features · `30` engineered features · `26.54%` churn rate ·
 `80/20` stratified split (5,634 train / 1,409 test, both exactly 26.54% churn). A donut
 showing 1,869 churned vs 5,174 retained. Feature groups: profile, services, contract &
 billing, value.
 
-**Slide 5 — PHASE 03 · Data Cleaning & Preprocessing.** Cleaning steps as a horizontal
+**Slide 6 — PHASE 03 · Data Cleaning & Preprocessing.** Cleaning steps as a horizontal
 flow: raw upload → clean → encode → 30 features. Two callouts: **leakage prevention** —
 Churn Score, Churn Reason, Churn Category and Customer Status were removed because they
 are only known after a customer has already churned; and **train/serve parity** — the 30
 columns are frozen and rebuilt by the same code for every upload.
 
-**Slide 6 — PHASE 04 · Exploratory Data Analysis.** The three findings that shaped
+**Slide 7 — PHASE 04 · Exploratory Data Analysis.** The three findings that shaped
 everything: contract type (month-to-month **42.7%** vs one-year 11.3% vs two-year **2.8%** —
 a 15× gap), tenure (**47.4%** of first-year customers churn; 55.5% of all churners are in
 year one), and service experience (fiber optic 41.9% vs 7.4% with no internet; no tech
 support 41.6%; no online security 41.8%). Two charts plus three takeaway cards.
 
-**Slide 7 — PHASE 05 · Feature Engineering.** 3 numeric features (tenure, monthly charges,
+**Slide 8 — PHASE 05 · Feature Engineering.** 3 numeric features (tenure, monthly charges,
 total charges) + 27 binary flags = 30. Why flags rather than invented ordering. The frozen
 column contract and the unit test that guards it.
 
-**Slide 8 — PHASE 06 · Model Development.** Four algorithms benchmarked: Logistic
+**Slide 9 — PHASE 06 · Model Development.** Four algorithms benchmarked: Logistic
 Regression, Random Forest, XGBoost, LightGBM. Same features, same split, same scoring code
 — only the algorithm changes. One line on why each was chosen. Grouped bar chart of the
 four models.
 
-**Slide 9 — PHASE 07 · Model Evaluation.** The measurement slide. Confusion matrix — TN
+**Slide 10 — PHASE 07 · Model Evaluation.** The measurement slide. Confusion matrix — TN
 919, FP 116, FN 161, TP 213 — plus an ROC curve at 84.91% AUC. Then **stability**: 5-fold
 stratified cross-validation gives F1 **62.11% ± 2.96%** and accuracy **81.19% ± 1.18%**,
 which contains the deployed result — so the single split is not carrying the outcome. State
 recall honestly: 56.95%.
 
-**Slide 10 — PHASE 08 · Model Selection — which algorithm.** The benchmark table:
+**Slide 11 — PHASE 08 · Model Selection — which algorithm.** The benchmark table:
 
 | Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|---|
@@ -198,7 +206,7 @@ recall honestly: 56.95%.
 The selected row is highlighted with a green border. Note that selection was made on F1 and
 ROC-AUC, never accuracy alone.
 
-**Slide 11 — PHASE 08 · Model Selection — the operating point.** The strongest slide in the
+**Slide 12 — PHASE 08 · Model Selection — the operating point.** The strongest slide in the
 deck. A threshold sweep table:
 
 | Threshold | Precision | Recall | F1 | Customers flagged |
@@ -213,41 +221,41 @@ recall to **77.81%** while ROC-AUC stays essentially unchanged (**84.89** vs **8
 evidence the model already ranks customers correctly and only the decision point was
 discarding churners.
 
-**Slide 12 — PHASE 09 · Explainability.** The profile of the high-risk band versus the
+**Slide 13 — PHASE 09 · Explainability.** The profile of the high-risk band versus the
 whole portfolio: **100%** month-to-month, **95%** no online security, **94%** no tech
 support, **91%** fiber optic, **80%** electronic check, **32%** senior citizens; average
 tenure **9.6 months** against 32.4 portfolio-wide. Per-customer explanation is computed as
 coefficient × feature value. State SHAP precisely: explored during research, production
 explanation uses the linear model's coefficients.
 
-**Slide 13 — PHASE 10 · Risk Segmentation.** Bands: `< 30%` Low · `30–60%` Medium ·
+**Slide 14 — PHASE 10 · Risk Segmentation.** Bands: `< 30%` Low · `30–60%` Medium ·
 `≥ 60%` High. Sizes: 4,435 / 1,473 / 1,135. Validation against real outcomes: actual churn
 **9.5% → 42.0% → 73.0%**, so the bands genuinely order risk. Operational payoff: prioritise
 1,135 customers instead of 7,043.
 
-**Slide 14 — PHASE 11 · Retention Intelligence.** 2,608 at-risk customers each received a
+**Slide 15 — PHASE 11 · Retention Intelligence.** 2,608 at-risk customers each received a
 specific action: Promote Long-Term Contract 792 · 5% Discount 663 · 15% Discount 658 ·
 Welcome Package 430 · Free Online Security 45 · Autopay 9 · Check-in 9 · Premium Support 2.
 Revenue framing: **$92,539/month** high risk, **$200,302** including medium. Say "revenue at
 risk / exposure" — never "saved."
 
-**Slide 15 — PHASE 12 · Business Intelligence.** The Power BI layer — four pages: executive
+**Slide 16 — PHASE 12 · Business Intelligence.** The Power BI layer — four pages: executive
 overview, customer insights, risk intelligence, retention strategy. Frame it as the
 descriptive and diagnostic layer beneath the predictive ML application. Show two light
 Power BI screenshots inside white cards.
 
-**Slide 16 — PHASE 13 · Web Application.** The Flask Signal Ops Console. Architecture:
+**Slide 17 — PHASE 13 · Web Application.** The Flask Signal Ops Console. Architecture:
 data → preprocessing → Logistic Regression → probability → {risk segmentation,
 explainability, retention actions} → {console, API, Power BI}. Console flow: upload → validate
 → score → dashboard KPIs → drill into a customer → download a report. Reports are private
 per visitor. Show two dark console screenshots.
 
-**Slide 17 — PHASE 14 · Deployment.** Gunicorn with a gthread worker, 300-second timeout,
+**Slide 18 — PHASE 14 · Deployment.** Gunicorn with a gthread worker, 300-second timeout,
 preload so the model loads once, periodic worker recycling to avoid memory restarts; Docker
 and Procfile provided; hosted on Render. The live URL, stated plainly. Mention cold starts
 on the free tier — the instance sleeps when idle.
 
-**Slide 18 — Technology Stack.** Four columns, grouped by role: *Language & Data* (Python
+**Slide 19 — Technology Stack.** Four columns, grouped by role: *Language & Data* (Python
 3.11, Pandas, NumPy, SQL Server, SQLAlchemy) · *Machine Learning* (Scikit-learn, Logistic
 Regression deployed, Random Forest, XGBoost, LightGBM, Joblib, SHAP) · *Web Application*
 (Flask, Jinja2, HTML5, CSS3, vanilla JavaScript, Gunicorn) · *APIs & Delivery* (FastAPI +
@@ -255,7 +263,7 @@ Pydantic, Docker, Render, Git/GitHub, Power BI). A callout explains why the stac
 together: one shared Python package handles preprocessing and scoring for the notebooks, the
 app and the API.
 
-**Slide 19 — Responsible AI, limitations & the next cycle.** Three panels. *Limitations:*
+**Slide 20 — Responsible AI, limitations & the next cycle.** Three panels. *Limitations:*
 historical data from one telecom; 56.95% recall at the deployed threshold; no live
 behavioural feed, drift monitoring or automatic retraining; probabilities are not
 guarantees. *Fairness note:* senior citizens churn at 41.7%, so the model may systematically
@@ -264,13 +272,13 @@ customer is expensive — which is the economic reason the operating threshold i
 decision, not a technical default. Close by looping back to Phase 02: drift detection and
 scheduled retraining begin the next cycle.
 
-**Slide 20 — See it running: demo and project links.** Keep the live application URL in
+**Slide 21 — See it running: demo and project links.** Keep the live application URL in
 full (`retainiq-predictive-customer-retention-zq6x.onrender.com`), the live-app QR, the
 repository link and its secondary QR. Invite the audience to explore the running app and
 source. Keep the project takeaway, presenter credit and headline metrics on this
 resources/demo slide.
 
-**Slide 21 — Thank You.** A separate final slide with a clear **Thank You** heading and
+**Slide 22 — Thank You.** A separate final slide with a clear **Thank You** heading and
 **Questions & discussion** invitation, the closing project message, presenter credit,
 headline metrics and a full-strength signal meter. Do not repeat the QR/resource panel.
 
@@ -279,7 +287,7 @@ headline metrics and a full-strength signal meter. Do not repeat the QR/resource
 # 4. REQUIRED SPEAKER NOTES
 
 For every slide, write speaker notes of roughly 45–60 seconds of natural spoken delivery
-(total ~10 minutes), plus a timing cue. Notes must:
+(total ~11 minutes 55 seconds), plus a timing cue. Notes must:
 - open with a spoken transition from the previous slide, not a topic label;
 - name the single most important number and say what it means;
 - where relevant, include a prepared answer to the obvious question.
@@ -307,7 +315,7 @@ these is worse than a bland slide.
 
 # 6. DELIVERABLE
 
-A **21-slide 16:9 presentation**, ending on a separate Thank You slide. Do not add appendix slides to this presentation.
+A **22-slide 16:9 presentation**, ending on a separate Thank You slide. Do not add appendix slides to this presentation.
 
 Deliver the deck as an editable file, with speaker notes embedded, and confirm for each
 slide that the alignment grid, the margin, and the 14-phase progress rail are consistent.
