@@ -40,6 +40,9 @@ LIVE_URL = (URL_FILE.read_text().strip() if URL_FILE.exists()
             else "https://retainiq-predictive-customer-retention-zq6x.onrender.com")
 LIVE_URL_DISPLAY = LIVE_URL.replace("https://", "")
 REPO_DISPLAY = "github.com/Logesh0247/RetainIQ_Signal_Ops_Console"
+REPO_URL = "https://github.com/Logesh0247/RetainIQ_Signal_Ops_Console"
+PBIT_URL = ("https://github.com/Logesh0247/RetainIQ_Signal_Ops_Console/blob/main/"
+            "Power_BI_dashboard/dashboard_template.pbit")
 
 # --- palette (static/style.css tokens) --------------------------------------
 INK = RGBColor(0x0A, 0x0F, 0x1C)
@@ -202,6 +205,9 @@ def text(slide, x, y, w, h, blocks, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
         run.font.size = Pt(item["pt"])
         run.font.bold = item.get("bold", False)
         run.font.color.rgb = item.get("color", TEXT)
+        if item.get("href"):
+            run.hyperlink.address = item["href"]
+            run.font.underline = item.get("underline", True)
 
         if audit:
             pt = item["pt"]
@@ -363,7 +369,7 @@ def build():
     signal_meter(s, 11.05, 1.78, filled=5, scale=1.05,
                  label="signal strength", color=OK)
 
-    _rk = stack([(1.24, 0.26), (0.74, 0)], top=4.94, bottom=6.84)
+    _rk = stack([(1.18, 0.14), (0.84, 0)], top=4.92, bottom=6.84)
     (r_kpi, r_cred) = _rk[0], _rk[1]
     kpi(s, M, r_kpi[0], 2.36, r_kpi[1], "80.34%", "TEST ACCURACY", OK, 27, 9.5)
     kpi(s, M + 2.50, r_kpi[0], 2.36, r_kpi[1], "84.91%", "ROC-AUC", OK, 27, 9.5)
@@ -372,10 +378,12 @@ def build():
         "MONTHLY REVENUE AT RISK IN THE HIGH-RISK BAND", BAD, 27, 9)
 
     text(s, M, r_cred[0], 12.1, r_cred[1],
-         [{"t": "Logesh S.   ·   B.Sc. Data Science", "pt": 12.5, "color": TEXT,
-           "bold": True, "space_after": 3},
-          {"t": f"Live application: {LIVE_URL_DISPLAY}     ·     Source: {REPO_DISPLAY}",
-           "pt": 10.5, "color": MUTED, "mono": True, "space_after": 0}])
+         [{"t": "Logesh S.   ·   B.Sc. Data Science", "pt": 11.5, "color": TEXT,
+           "bold": True, "space_after": 2},
+          {"t": f"LIVE APP  ↗  {LIVE_URL_DISPLAY}", "pt": 9.8, "color": ACTION,
+           "mono": True, "space_after": 2, "href": LIVE_URL},
+          {"t": f"SOURCE  ↗  {REPO_DISPLAY}", "pt": 9.8, "color": MUTED,
+           "mono": True, "space_after": 0, "href": REPO_URL}])
     notes(s, """
 OPENING (0:00–0:35). "Good morning. A telecom knows it lost a quarter of its
 customers last year. What it cannot tell you is who leaves next month, why, or
@@ -958,11 +966,15 @@ a month sitting in the high-risk band. I deliberately do not call it savings."
     eyebrow(s, "PHASE 12  ·  BUSINESS INTELLIGENCE")
     y = heading(s, "The descriptive layer beneath the predictions",
                 "A four-page Power BI dashboard for the people who fund the retention team")
-    _r = stack([(3.41, 0.16), (1.57, 0)]); r_pbi, r_cards = _r[0], _r[1]
+    _r = stack([(3.26, 0.12), (1.30, 0.12), (0.34, 0)])
+    r_pbi, r_cards, r_link = _r[0], _r[1], _r[2]
     for i, src in enumerate(["page1_executive_overview.png.png",
                              "page3_risk_intelligence.png.png"]):
-        pic_h = img_h(PBI / src, 5.82) + 0.18
-        picture_card(s, PBI / src, M + i * 6.30, r_pbi[0], 6.00, pic_h)
+        path = PBI / src
+        card_h = r_pbi[1]
+        card_w = min(6.00, img_w(path, card_h - 0.18) + 0.18)
+        x = M + i * 6.30 + (6.00 - card_w) / 2
+        picture_card(s, path, x, r_pbi[0], card_w, card_h)
     yy = r_cards[0]
     cards = [
         ("Executive overview", "Portfolio KPIs, churn rate and revenue in one view for management.", OK),
@@ -978,13 +990,19 @@ a month sitting in the high-risk band. I deliberately do not call it savings."
         text(s, x + 0.20, yy + 0.16, cw - 0.42, r_cards[1] - 0.30,
              [{"t": t, "pt": 11.5, "color": c, "bold": True, "space_after": 4},
               {"t": b, "pt": 10.0, "color": TEXT, "space_after": 0, "spacing": 1.16}])
+    rect(s, M, r_link[0], CW, r_link[1], fill=PANEL_2, edge=ACTION, edge_w=1.0)
+    text(s, M + 0.20, r_link[0] + 0.02, CW - 0.40, r_link[1] - 0.04,
+         [{"t": "OPEN THE EDITABLE POWER BI TEMPLATE (.PBIT)  ↗", "pt": 10.5,
+           "color": ACTION, "bold": True, "mono": True, "space_after": 0,
+           "href": PBIT_URL}], anchor=MSO_ANCHOR.MIDDLE, audit=False)
     footer(s, n, phase=11)
     notes(s, """
 (8:50–9:15) "The machine learning app answers what is likely to happen. Power BI
 answers what already happened and why — and it's what a non-technical
 stakeholder actually opens."
 Four pages: executive overview, customer insights, risk intelligence, retention
-strategy. One sentence each, don't linger.
+strategy. One sentence each, don't linger. Point out the underlined .pbit link —
+it opens the reusable report template in the project repository.
 """)
 
     # =========================================================== 16 PHASE 13
@@ -1072,55 +1090,73 @@ before we start."
     n += 1
     s = add_slide(prs)
     eyebrow(s, "TECHNOLOGY STACK")
-    y = heading(s, "Everything the project is built on",
-                "One requirement drove the whole stack: the same code must train the "
-                "model and serve it")
-    groups = [
-        ("LANGUAGE & DATA", OK, ["Python 3.11", "Pandas — data handling",
-                                 "NumPy — numerics",
-                                 "SQL Server — extraction",
-                                 "SQLAlchemy — DB layer"]),
-        ("MACHINE LEARNING", WARN, ["Scikit-learn — training",
-                                    "Logistic Regression (live)",
-                                    "Random Forest · XGBoost · LightGBM",
-                                    "Joblib — model files",
-                                    "SHAP — research only"]),
-        ("WEB APPLICATION", ACTION, ["Flask — app server",
-                                     "Jinja2 — templates",
-                                     "HTML5 · CSS3 — design system",
-                                     "Vanilla JavaScript — charts",
-                                     "Gunicorn — WSGI server"]),
-        ("APIs & DELIVERY", BAD, ["FastAPI + Pydantic — API",
-                                  "Docker — container",
-                                  "Render — cloud host",
-                                  "Git & GitHub — versioning",
-                                  "Power BI (.pbix / .pbit)"]),
-    ]
-    cw = (CW - 3 * 0.20) / 4
-    _r = stack([(3.34, 0.16), (1.64, 0)]); r_col, r_call = _r[0], _r[1]
-    for i, (title, coll, items) in enumerate(groups):
-        x = M + i * (cw + 0.20)
-        rect(s, x, r_col[0], cw, r_col[1], fill=PANEL, edge=LINE)
-        bar(s, x, r_col[0], cw, 0.045, coll)
-        blocks = [{"t": title, "pt": 11, "color": coll, "bold": True, "mono": True,
-                   "space_after": 13}]
-        blocks += [{"t": f"·  {item}", "pt": 11.6, "color": TEXT, "space_after": 15,
-                    "spacing": 1.14} for item in items]
-        text(s, x + 0.20, r_col[0] + 0.26, cw - 0.40, r_col[1] - 0.46, blocks)
+    y = heading(s, "Tools behind the RetainIQ workflow",
+                "A shared Python path keeps model training and live scoring in sync")
 
-    callout(s, M, r_call[0], CW, r_call[1], "THE DESIGN CHOICE BEHIND THE STACK",
-            "Preprocessing, the saved column contract and the scoring functions are a "
-            "single Python package imported by the notebooks, the Flask app, the FastAPI "
-            "wrapper and the evaluation scripts. That is what makes training and "
-            "production behaviour the same thing rather than two similar things.", OK)
+    logo_dir = ASSETS / "tool_logos"
+    logo_panel_w, logo_gap = 3.10, 0.20
+    logo_x, logo_y = M, CONTENT_TOP
+    rect(s, logo_x, logo_y, logo_panel_w, CAV, fill=PANEL, edge=LINE)
+    text(s, logo_x + 0.16, logo_y + 0.12, logo_panel_w - 0.32, 0.24,
+         [{"t": "TOOLS USED", "pt": 9.8, "color": MUTED, "bold": True,
+           "mono": True, "space_after": 0}], audit=False)
+
+    logo_items = [
+        ("python", "Python"), ("pandas", "Pandas"),
+        ("scikitlearn", "Scikit-learn"), ("flask", "Flask"),
+        ("fastapi", "FastAPI"), ("docker", "Docker"),
+        ("powerbi", "Power BI"), ("github", "GitHub"),
+    ]
+    logo_pad, logo_col_gap = 0.16, 0.12
+    tile_w = (logo_panel_w - 2 * logo_pad - logo_col_gap) / 2
+    tile_h, tile_gap, grid_top = 1.02, 0.08, logo_y + 0.47
+    for i, (icon, label) in enumerate(logo_items):
+        col, row = i % 2, i // 2
+        x = logo_x + logo_pad + col * (tile_w + logo_col_gap)
+        yy = grid_top + row * (tile_h + tile_gap)
+        rect(s, x, yy, tile_w, tile_h, fill=PANEL_2, edge=LINE_SOFT)
+        icon_path = logo_dir / f"{icon}.png"
+        image_fit(s, icon_path, x + (tile_w - 0.42) / 2, yy + 0.09, 0.42, 0.42)
+        text(s, x + 0.05, yy + 0.58, tile_w - 0.10, 0.25,
+             [{"t": label, "pt": 9.2, "color": TEXT, "bold": True,
+               "space_after": 0, "align": PP_ALIGN.CENTER}], audit=False)
+
+    right_x = logo_x + logo_panel_w + logo_gap
+    right_w = SW - M - right_x
+    groups = [
+        ("LANGUAGE & DATA", OK,
+         ["Python 3.11 · Pandas · NumPy · SQL Server · SQLAlchemy"]),
+        ("MACHINE LEARNING", WARN,
+         ["Scikit-learn · Logistic Regression (deployed) · Random Forest",
+          "XGBoost · LightGBM · Joblib · SHAP (research only)"]),
+        ("WEB APPLICATION", ACTION,
+         ["Flask · Jinja2 · HTML5/CSS3 · Vanilla JavaScript · Gunicorn"]),
+        ("API & DELIVERY", BAD,
+         ["FastAPI + Pydantic · Docker · Render · Git/GitHub",
+          "Power BI · .pbix report · .pbit template"]),
+    ]
+    row_gap = 0.14
+    card_h = (CAV - 3 * row_gap) / 4
+    for i, (title, color, details) in enumerate(groups):
+        yy = CONTENT_TOP + i * (card_h + row_gap)
+        rect(s, right_x, yy, right_w, card_h, fill=PANEL, edge=LINE)
+        bar(s, right_x, yy, 0.045, card_h, color)
+        blocks = [{"t": title, "pt": 10.2, "color": color, "bold": True,
+                   "mono": True, "space_after": 5}]
+        blocks += [{"t": line, "pt": 12.7, "color": TEXT,
+                    "space_after": 0, "spacing": 1.18} for line in details]
+        text(s, right_x + 0.22, yy + 0.14, right_w - 0.42, card_h - 0.26,
+             blocks)
+
     footer(s, n, complete_through=len(PHASES))
     notes(s, """
-(10:10–10:35) Do not read the columns. One sentence each.
-"Python and pandas for the data work. Scikit-learn, four algorithms, Logistic
-Regression deployed. Flask with a hand-built CSS design system for the product.
-FastAPI, Docker and Render around it. Power BI for the business layer."
-If asked about a tool that isn't here: only claim what can be opened in the
-repository.
+(10:10–10:35) Use the logos as visual anchors; do not read the lists line by line.
+"Python, pandas and NumPy handle the data. Scikit-learn trains the deployed
+Logistic Regression; Flask and FastAPI expose it; Docker, Render and GitHub carry
+it to production; Power BI presents the business view."
+SHAP was explored only in research; the production explanations come from the
+Logistic Regression coefficients. One shared Python package keeps training and
+serving on the same preprocessing and scoring path.
 """)
 
     # =========================================================== 19 RESPONSIBLE AI
@@ -1201,16 +1237,16 @@ monitoring."
     text(s, M + 0.28, r_pan[0] + 0.24, 5.26, r_pan[1] - 0.48,
          [{"t": "LIVE APPLICATION", "pt": 10.5, "color": OK, "bold": True, "mono": True,
            "space_after": 8},
-          {"t": LIVE_URL_DISPLAY, "pt": 11, "color": TEXT, "bold": True,
-           "space_after": 10, "spacing": 1.16},
+          {"t": LIVE_URL_DISPLAY, "pt": 11, "color": ACTION, "bold": True,
+           "space_after": 10, "spacing": 1.16, "href": LIVE_URL},
           {"t": "Bulk score a customer CSV, read the dashboard, and download a private "
                 "report. The model, risk bands, explanations and recommendations run "
                 "live — the same code paths that produced every figure in this deck.",
            "pt": 10.8, "color": MUTED, "space_after": 12, "spacing": 1.20},
           {"t": "SOURCE CODE", "pt": 10.5, "color": ACTION, "bold": True, "mono": True,
            "space_after": 5},
-          {"t": REPO_DISPLAY, "pt": 10.6, "color": TEXT, "mono": True, "space_after": 12,
-           "spacing": 1.16},
+          {"t": REPO_DISPLAY, "pt": 10.6, "color": ACTION, "mono": True,
+           "space_after": 12, "spacing": 1.16, "href": REPO_URL},
           {"t": "Notebooks 01–09, the Flask console, the FastAPI wrapper and the "
                 "nine-test suite are all in the repository.", "pt": 10.4,
            "color": MUTED, "space_after": 10, "spacing": 1.18},
@@ -1314,148 +1350,9 @@ LIKELY QUESTIONS
     notes(s, "Backup slide. Use if anyone questions the benchmark or wants the full "
              "metric set.")
 
-    # =========================================================== A2 HYPERPARAMS
-    n += 1
-    s = add_slide(prs)
-    eyebrow(s, "APPENDIX", color=MUTED)
-    y = heading(s, "Hyperparameters",
-                "Read directly from the saved model artifacts and the training notebook")
-    rows = [
-        ("Model", "Settings"),
-        ("Logistic Regression", "max_iter=5000, C=1.0, solver='lbfgs'"),
-        ("Random Forest", "n_estimators=200, random_state=42"),
-        ("XGBoost", "XGBClassifier(random_state=42) — library defaults otherwise"),
-        ("LightGBM", "LGBMClassifier(random_state=42) — library defaults otherwise"),
-    ]
-    _r = stack([(3.30, 0.16), (1.68, 0)]); r_tbl, r_call = _r[0], _r[1]
-    row_h = (r_tbl[1] - 0.05) / 5
-    yy = r_tbl[0]
-    for ri, (a, b) in enumerate(rows):
-        hdr = ri == 0
-        rect(s, M, yy, 3.60, row_h, fill=PANEL_2 if hdr else PANEL, edge=LINE)
-        rect(s, M + 3.60, yy, 8.49, row_h, fill=PANEL_2 if hdr else PANEL, edge=LINE)
-        text(s, M + 0.16, yy + (row_h - 0.30) / 2, 3.35, 0.30,
-             [{"t": a, "pt": 10.8, "color": MUTED if hdr else TEXT, "bold": hdr,
-               "space_after": 0}], audit=False)
-        text(s, M + 3.76, yy + (row_h - 0.30) / 2, 8.20, 0.30,
-             [{"t": b, "pt": 10.4, "color": MUTED if hdr else OK, "mono": not hdr,
-               "bold": hdr, "space_after": 0}], audit=False)
-        yy += row_h + 0.012
-    callout(s, M, r_call[0], CW, r_call[1], "A NOTE ON TUNING",
-            "No automated hyperparameter search was run — the algorithms were compared "
-            "under their default configurations, which keeps the benchmark a fair test of "
-            "the algorithms rather than of how much tuning effort each received. The "
-            "XGBoost and LightGBM instances were constructed with only random_state set, "
-            "so their remaining settings are library defaults; that is what the saved "
-            "artifacts contain. A tuning sweep is on the next-cycle list.", WARN)
-    footer(s, n, complete_through=len(PHASES), label="Appendix · use only if asked")
-    notes(s, "Backup slide for 'what parameters did you use?'. Be straightforward: these "
-             "are defaults, and that was deliberate so the comparison tested algorithms "
-             "rather than tuning effort.")
-
-    # =========================================================== A3 FEATURES
-    n += 1
-    s = add_slide(prs)
-    eyebrow(s, "APPENDIX", color=MUTED)
-    y = heading(s, "The 30 model inputs",
-                "Three numeric measures plus twenty-seven encoded flags, in model order")
-    import joblib
-    features = list(joblib.load(ROOT / "models" / "feature_columns.pkl"))
-    half = (len(features) + 1) // 2
-    for col_i, chunk in enumerate([features[:half], features[half:]]):
-        x = M + col_i * (CW / 2 + 0.10)
-        blocks = []
-        start = col_i * half + 1
-        for k, feat in enumerate(chunk):
-            blocks.append({"t": f"{start + k:>2d}.  {feat}", "pt": 11.5, "color": TEXT,
-                           "mono": True, "space_after": 8.5})
-        text(s, x, CONTENT_TOP, CW / 2 - 0.10, CAV, blocks)
-    footer(s, n, complete_through=len(PHASES), label="Appendix · use only if asked")
-    notes(s, "Backup slide. Any question about which variables the model sees can be "
-             "answered by pointing here.")
-
-    # =========================================================== A4 API + PROVENANCE
-    n += 1
-    s = add_slide(prs)
-    eyebrow(s, "APPENDIX", color=MUTED)
-    y = heading(s, "Prediction API & where every figure came from",
-                "The same engine, exposed programmatically — and the provenance of this deck")
-    _r = stack([(3.06, 0.16), (1.92, 0)]); r_top, r_call = _r[0], _r[1]
-    rect(s, M, r_top[0], 5.30, r_top[1], fill=PANEL_2, edge=LINE)
-    text(s, M + 0.20, r_top[0] + 0.18, 4.90, r_top[1] - 0.36,
-         [{"t": "POST /api/predict", "pt": 11, "color": OK, "bold": True, "mono": True,
-           "space_after": 7},
-          {"t": "{ \"gender\": \"Male\", \"SeniorCitizen\": 1,", "pt": 9.6, "color": TEXT, "space_after": 1, "mono": True},
-          {"t": "  \"tenure\": 8, \"Contract\": \"Month-to-month\",", "pt": 9.6, "color": TEXT, "space_after": 1, "mono": True},
-          {"t": "  \"InternetService\": \"Fiber optic\", ... }", "pt": 9.6, "color": TEXT, "space_after": 9, "mono": True},
-          {"t": "→  probability · prediction · risk_level", "pt": 9.8, "color": OK, "space_after": 1, "mono": True},
-          {"t": "→  top_drivers · recommendations", "pt": 9.8, "color": OK,
-           "space_after": 12, "mono": True},
-          {"t": "GET /api/health  →  the uptime probe the host checks before it "
-                "routes traffic", "pt": 9.8, "color": MUTED, "space_after": 0,
-           "mono": True}])
-    rect(s, 6.12, r_top[0], 6.59, r_top[1], fill=PANEL, edge=LINE)
-    text(s, 6.32, r_top[0] + 0.18, 6.19, r_top[1] - 0.36,
-         [{"t": "FIGURE PROVENANCE", "pt": 11, "color": OK, "bold": True, "mono": True,
-           "space_after": 7},
-          {"t": "Churn split, contract, internet, tenure  →  Data/01.Telco_customer_churn_Dataset.csv",
-           "pt": 9.8, "color": TEXT, "space_after": 4, "spacing": 1.14},
-          {"t": "Benchmark, confusion matrix, ROC  →  models/*.pkl on the held-out split",
-           "pt": 9.8, "color": TEXT, "space_after": 4, "spacing": 1.14},
-          {"t": "Threshold sweep, CV, imbalance  →  presentation/build_assets.py",
-           "pt": 9.8, "color": TEXT, "space_after": 4, "spacing": 1.14},
-          {"t": "Risk bands, profile, revenue  →  the production scoring pipeline",
-           "pt": 9.8, "color": TEXT, "space_after": 4, "spacing": 1.14},
-          {"t": "QR codes  →  build_qr.py, decoded back to verify", "pt": 9.8,
-           "color": TEXT, "space_after": 4, "spacing": 1.14},
-          {"t": "Console screenshots  →  templates/images/ from the running app",
-           "pt": 9.8, "color": TEXT, "space_after": 4, "spacing": 1.14},
-          {"t": "Power BI pages  →  Power_BI_dashboard/Screenshots/", "pt": 9.8,
-           "color": TEXT, "space_after": 0, "spacing": 1.14}])
-    callout(s, M, r_call[0], CW, r_call[1], "THE POINT",
-            "Nothing in this deck is hand-typed. build_assets.py recomputes every figure "
-            "from the saved artifacts and the production scoring path, so the deck cannot "
-            "drift away from the project — retrain a model and the charts and the "
-            "benchmark table regenerate together.", OK)
-    footer(s, n, complete_through=len(PHASES), label="Appendix · use only if asked")
-    notes(s, "Backup slide for API and reproducibility questions. Strong answer to "
-             "'how do we know these numbers are right?'")
-
-    # =========================================================== A5 SYSTEM MAP
-    n += 1
-    s = add_slide(prs)
-    eyebrow(s, "APPENDIX", color=MUTED)
-    y = heading(s, "How the system fits together",
-                "One shared path from raw customer data to the console, the API and the BI layer")
-    _r = stack([(3.60, 0.16), (1.38, 0)]); r_map, r_cards = _r[0], _r[1]
-    image_fit(s, ASSETS / "chart_architecture.png", M, r_map[0], CW, r_map[1])
-    cards = [
-        ("ONE PREPROCESSING PATH", "The notebook pipeline and the app import the same "
-         "transformations, so a score in the console and a metric in this deck come "
-         "from the same 30 features.", ACTION),
-        ("TWO ENTRY POINTS", "The Flask console serves the reviewable UI; the FastAPI "
-         "wrapper serves the same model to any other client. Both load the frozen "
-         "feature list.", OK),
-        ("LAYERS ON TOP", "Risk bands and recommendations are rules over the "
-         "probability, not a second model — which is why they are auditable.", WARN),
-    ]
-    cw = (CW - 2 * 0.22) / 3
-    for i, (title, body, c) in enumerate(cards):
-        x = M + i * (cw + 0.22)
-        rect(s, x, r_cards[0], cw, r_cards[1], fill=PANEL, edge=LINE)
-        bar(s, x, r_cards[0] + 0.14, 0.035, r_cards[1] - 0.28, c)
-        text(s, x + 0.20, r_cards[0] + 0.16, cw - 0.42, r_cards[1] - 0.32,
-             [{"t": title, "pt": 10, "color": c, "bold": True, "mono": True,
-               "space_after": 5},
-              {"t": body, "pt": 10.2, "color": TEXT, "space_after": 0, "spacing": 1.16}])
-    footer(s, n, complete_through=len(PHASES), label="Appendix · use only if asked")
-    notes(s, "Backup slide. Use it if a reviewer asks how the pieces connect, or how "
-             "the notebook work reaches the running app. The answer is one shared "
-             "preprocessing path and a frozen feature contract.")
-
+    # Slide 21 is the final appendix page; no slides follow it.
     prs.save(OUT)
     return OUT
-
 
 def main():
     out = build()

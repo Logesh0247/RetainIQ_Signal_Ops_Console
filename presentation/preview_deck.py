@@ -107,9 +107,9 @@ def render(slide, index):
             try:
                 blob = shape.image.blob
                 import io
-                pic = Image.open(io.BytesIO(blob)).convert("RGB")
+                pic = Image.open(io.BytesIO(blob)).convert("RGBA")
                 pic = pic.resize((max(1, int(w)), max(1, int(h))), Image.LANCZOS)
-                img.paste(pic, (int(x), int(y)))
+                img.paste(pic, (int(x), int(y)), pic.getchannel("A"))
             except Exception:
                 pass
             continue

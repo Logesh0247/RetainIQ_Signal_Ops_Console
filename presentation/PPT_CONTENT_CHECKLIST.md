@@ -2,9 +2,9 @@
 
 Every detail the deck must contain, with the verified value for each.
 
-Status: ✅ = already in `RetainIQ_Project_Review.pptx` (25 slides: 20 content in
-three acts + 5 appendix slides, with the 14-phase progress rail on every content
-slide). Every content slide is laid out on the vertical fill engine in
+Status: ✅ = already in `RetainIQ_Project_Review.pptx` (21 slides: 20 content in
+three acts + 1 appendix benchmark slide; the user requested that slides after 21
+be removed). Every content slide is laid out on the vertical fill engine in
 `presentation/build_deck.py` — kicker/heading → content band (1.66in–6.80in) →
 rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 `audit_layout.py` (dead space) and `preview_deck.py` (rasterised renders).
@@ -123,6 +123,7 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 ## 14. Engineering & deployment (slide 13)
 
 - ✅ Power BI: 4 pages — executive overview, customer insights, risk intelligence, retention strategy
+- ✅ Clickable `.pbit` template link on slide 15 (GitHub file page)
 - ✅ API: Flask `/api/health`, `/api/predict` + FastAPI wrapper with Pydantic validation
 - ✅ Tests: 9 unit tests (encoding, model load, scoring, risk, recommendations, CSV validation, report privacy)
 - ✅ Deployment: Gunicorn (gthread, 300s timeout, preload, worker recycling), Docker, Procfile, Render
@@ -130,7 +131,7 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 
 ## 15. Technology stack (slide 18)
 
-- ✅ Built: four columns grouped by role, with the shared-package design rationale
+- ✅ Built: tool logos in a left-side rail; spacious grouped stack details on the right
 
 - **Language & data:** Python 3.11 · Pandas · NumPy · SQL Server · SQLAlchemy
 - **Machine learning:** Scikit-learn · Logistic Regression (deployed) · Random Forest · XGBoost · LightGBM · Joblib · SHAP
@@ -157,7 +158,8 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 
 ## 18. Closing — link + QR (slide 20)
 
-- ✅ Built: full URL, verified live-app QR, repository QR, contribution line, questions prompt
+- ✅ Built: clickable live-app URL, verified live-app QR, clickable repository URL,
+  repository QR, contribution line, questions prompt
 
 Additional content it carries:
 
@@ -174,14 +176,16 @@ Additional content it carries:
 ## Presentation mechanics (not slide content, but required)
 
 - ✅ Speaker notes on every slide with timings totalling ~10 minutes
-- ✅ Backup slides: full benchmark table, hyperparameters, the 30 inputs,
-  prediction API + figure provenance, system architecture map
+- ✅ Appendix retained on slide 21: full benchmark table. Slides 22 onward are
+  intentionally omitted from the deliverable.
 - ✅ Section numbering and slide numbers
 - ✅ Consistent dark "Signal Ops" theme matching the live product
 
 ## Assets that must exist in the repo
 
-- ✅ 11 generated charts (`presentation/assets/`) — all reproducible
+- ✅ 15 generated charts (`presentation/assets/`) — all reproducible
+- ✅ Tool marks (Python, Pandas, Scikit-learn, Flask, FastAPI, Docker, Power BI,
+  GitHub) in `presentation/assets/tool_logos/`; source attribution is included there
 - ✅ `model_metrics.csv` — exported benchmark table
 - ✅ 5 console screenshots (`templates/images/`)
 - ✅ 4 Power BI screenshots (`Power_BI_dashboard/Screenshots/`)
