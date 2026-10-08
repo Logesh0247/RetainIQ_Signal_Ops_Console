@@ -678,9 +678,9 @@ def chart_cv(stability: dict):
 
 def chart_cycle():
     """The 14-phase development cycle, grouped into the deck's three acts."""
-    fig, ax = plt.subplots(figsize=(13.0, 4.5))
+    fig, ax = plt.subplots(figsize=(13.0, 4.85))
     ax.set_xlim(0, 100)
-    ax.set_ylim(0, 48)
+    ax.set_ylim(0, 54)
     ax.axis("off")
     ax.grid(False)
 
@@ -698,11 +698,11 @@ def chart_cycle():
     pad = 2.0
     usable = 100 - pad * 2
     box_h = 9.0
-    label_gap = 1.8
+    label_gap = 3.6
 
-    # Keep a clear gutter between each row of phase boxes and its act label.
-    # The following row then starts far enough below the label to avoid crowding.
-    tops = [44.5, 29.5, 14.5]
+    # Leave visible padding between each row of phase boxes and its act label,
+    # with a separate gutter before the next row.
+    tops = [52.0, 34.5, 17.0]
 
     for (act, arc_name, color, phases), top in zip(arcs, tops):
         y = top - box_h
