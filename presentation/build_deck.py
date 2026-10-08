@@ -1109,29 +1109,73 @@ test."
     y = heading(s, "Making it survive production",
                 "Free-tier hosting is unforgiving — these are the four problems it creates")
     problems = [
-        ("Slow scoring on a shared CPU", "A large CSV can take far longer than the default 30-second worker timeout, so the worker is killed mid-request and the browser shows a 502.", "300-second timeout", OK),
-        ("Reloading the model per request", "Reading the pickled model on every request wastes the little memory the instance has.", "worker preload", OK),
-        ("Memory creeping past the limit", "A long-lived worker grows until the platform OOM-kills it, which surfaces as a random error.", "request recycling", OK),
-        ("The free tier sleeps", "An idle instance is suspended, so the first visitor waits for a cold start.", "warm it before demoing", WARN),
+        ("LATENCY", "Slow bulk scoring",
+         "A large CSV can outlast the default 30-second timeout, killing the worker and returning a 502.",
+         "TIMEOUT 300S", OK),
+        ("MODEL LOAD", "Reloading on every request",
+         "Reading the model pickle for every request wastes scarce instance memory.",
+         "GUNICORN PRELOAD", OK),
+        ("MEMORY", "Long-lived workers grow",
+         "A worker can accumulate memory over time until the host kills the process.",
+         "REQUEST RECYCLING", OK),
+        ("COLD START", "The free tier sleeps",
+         "After idle time, the host suspends the app and the first visitor waits for a cold start.",
+         "WARM BEFORE DEMO", WARN),
     ]
     ch = (CW - 0.26) / 2
     _r = stack([(1.94, 0.16), (1.94, 0.16), (0.94, 0)])
     r1, r2, r_call = _r[0], _r[1], _r[2]
-    for i, (t, b, fix, c) in enumerate(problems):
+    for i, (tag, title, body, fix, color) in enumerate(problems):
         x = M + (i % 2) * (ch + 0.26)
         yy, hh = (r1 if i < 2 else r2)
         rect(s, x, yy, ch, hh, fill=PANEL, edge=LINE)
-        bar(s, x, yy + 0.16, 0.035, hh - 0.32, c)
-        text(s, x + 0.24, yy + 0.18, ch - 0.50, hh - 0.36,
-             [{"t": t, "pt": 12, "color": TEXT, "bold": True, "space_after": 4},
-              {"t": b, "pt": 10.2, "color": MUTED, "space_after": 5, "spacing": 1.16},
-              {"t": f"→ fixed by {fix}", "pt": 10.4, "color": c, "bold": True,
-               "mono": True, "space_after": 0}])
+        bar(s, x, yy + 0.16, 0.045, hh - 0.32, color)
 
-    callout(s, M, r_call[0], CW, r_call[1], "SHIPPED AS",
-            "Gunicorn with a threaded worker · Dockerfile and Procfile · version-pinned "
-            "requirements · hosted on Render, where the application answers at the URL on "
-            "the closing slide.", ACTION)
+        # A compact numbered rail creates a clear scan path through the four risks.
+        text(s, x + 0.18, yy + 0.22, 0.68, 0.42,
+             [{"t": f"{i + 1:02d}", "pt": 22, "color": color, "bold": True,
+               "mono": True, "space_after": 0}], audit=False)
+        text(s, x + 0.18, yy + 0.77, 0.82, 0.28,
+             [{"t": tag, "pt": 8.2, "color": MUTED, "bold": True,
+               "mono": True, "space_after": 0}], audit=False)
+        bar(s, x + 1.00, yy + 0.20, 0.025, hh - 0.40, LINE)
+
+        main_x, main_w = x + 1.18, ch - 1.42
+        text(s, main_x, yy + 0.18, main_w, 0.32,
+             [{"t": title, "pt": 12.2, "color": TEXT, "bold": True,
+               "space_after": 0}])
+        text(s, main_x, yy + 0.56, main_w, 0.67,
+             [{"t": body, "pt": 10.4, "color": MUTED, "space_after": 0,
+               "spacing": 1.16}])
+
+        fix_y = yy + hh - 0.48
+        rect(s, main_x, fix_y, main_w, 0.30, fill=PANEL_2, edge=color, edge_w=0.8)
+        text(s, main_x + 0.12, fix_y + 0.035, main_w - 0.24, 0.22,
+             [{"t": f"→  {fix}", "pt": 8.9, "color": color, "bold": True,
+               "mono": True, "space_after": 0}], audit=False)
+
+    # Runtime strip: concise chips make the actual deployment choices easy to scan.
+    rect(s, M, r_call[0], CW, r_call[1], fill=PANEL_2, edge=ACTION, edge_w=1.1)
+    text(s, M + 0.20, r_call[0] + 0.35, 1.52, 0.28,
+         [{"t": "DEPLOYMENT\nSTACK", "pt": 9.2, "color": ACTION, "bold": True,
+           "mono": True, "space_after": 0}], audit=False)
+    runtime_chips = [
+        ("GUNICORN · GTHREAD", 1.70, OK),
+        ("TIMEOUT 300S", 1.30, ACTION),
+        ("PRELOAD + RECYCLE", 1.72, OK),
+        ("DOCKERFILE · PROCFILE", 1.92, ACTION),
+        ("PINNED REQS · RENDER", 1.95, OK),
+    ]
+    chip_x = M + 1.88
+    chip_gap = 0.10
+    for label, chip_w, color in runtime_chips:
+        rect(s, chip_x, r_call[0] + 0.32, chip_w, 0.32,
+             fill=PANEL, edge=LINE, edge_w=0.7)
+        text(s, chip_x + 0.08, r_call[0] + 0.365, chip_w - 0.16, 0.22,
+             [{"t": label, "pt": 8.0, "color": color, "bold": True,
+               "mono": True, "space_after": 0}], audit=False)
+        chip_x += chip_w + chip_gap
+
     footer(s, n, phase=13)
     notes(s, """
 (10:20–10:45) Don't list technology here — that's the next slide. This slide is
