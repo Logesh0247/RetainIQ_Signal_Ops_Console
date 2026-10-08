@@ -2,9 +2,9 @@
 
 Every detail the deck must contain, with the verified value for each.
 
-Status: ✅ = already in `RetainIQ_Project_Review.pptx` (21 slides: 20 content in
-three acts + 1 appendix benchmark slide; the user requested that slides after 21
-be removed). Every content slide is laid out on the vertical fill engine in
+Status: ✅ = already in `RetainIQ_Project_Review.pptx` (16 slides: title, roadmap,
+and lifecycle phases 01–13; slides 17–21 were removed at the user's request).
+Every retained content slide is laid out on the vertical fill engine in
 `presentation/build_deck.py` — kicker/heading → content band (1.66in–6.80in) →
 rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 `audit_layout.py` (dead space) and `preview_deck.py` (rasterised renders).
@@ -129,9 +129,9 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Deployment: Gunicorn (gthread, 300s timeout, preload, worker recycling), Docker, Procfile, Render
 - ✅ Reproducibility: one script regenerates every chart and metric
 
-## 15. Technology stack (slide 18)
+## 15. Technology stack (formerly slide 18)
 
-- ✅ Built: tool logos in a left-side rail; spacious grouped stack details on the right
+- ⬜ Not in this shortened deck; removed with slides 17–21 at the user's request.
 
 - **Language & data:** Python 3.11 · Pandas · NumPy · SQL Server · SQLAlchemy
 - **Machine learning:** Scikit-learn · Logistic Regression (deployed) · Random Forest · XGBoost · LightGBM · Joblib · SHAP
@@ -140,26 +140,15 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - The reason the stack hangs together: one shared Python package for preprocessing + scoring
 - ⚠️ **Do not claim Plotly** — it appears in an older README draft but is not imported anywhere in the code
 
-## 16. Limitations (slide 15) — reviewers probe here
+## 16. Limitations & future work
 
-- ✅ Historical data from one telecom
-- ✅ 56.95% recall — two in five churners missed
-- ✅ No live behavioural feed, no drift monitoring, no auto-retraining
-- ✅ Probabilities are not guarantees
-- ✅ Revenue is exposure, not realised savings
+- ⬜ Removed with slides 17–21 in the 16-slide cut; supporting material remains in
+  the notes/source repo, not on the slides.
 
-## 17. Future work (slide 15)
+## 18. Closing — link + QR (formerly slide 20)
 
-- ✅ Threshold tuning and probability calibration
-- ✅ Cost-sensitive learning
-- ✅ Drift detection + scheduled retraining (MLOps)
-- ✅ Counterfactual / what-if explanations
-- ✅ CRM integration and A/B testing of offers
-
-## 18. Closing — link + QR (slide 20)
-
-- ✅ Built: clickable live-app URL, verified live-app QR, clickable repository URL,
-  repository QR, contribution line, questions prompt
+- ⬜ Closing slide and QR were removed with slides 17–21. The clickable live-app
+  and repository URLs remain on the cover; the Power BI `.pbit` link remains on slide 15.
 
 Additional content it carries:
 
@@ -176,8 +165,7 @@ Additional content it carries:
 ## Presentation mechanics (not slide content, but required)
 
 - ✅ Speaker notes on every slide with timings totalling ~10 minutes
-- ✅ Appendix retained on slide 21: full benchmark table. Slides 22 onward are
-  intentionally omitted from the deliverable.
+- ⬜ No appendix in this shortened 16-slide version; all slides after 16 are omitted.
 - ✅ Section numbering and slide numbers
 - ✅ Consistent dark "Signal Ops" theme matching the live product
 
