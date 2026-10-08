@@ -422,48 +422,59 @@ Promise the structure and then keep it. Do not narrate every box.
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 01  ·  BUSINESS UNDERSTANDING")
-    y = heading(s, "The problem: retention is still reactive",
-                "Reports explain what happened. They do not say who leaves next.")
-    _r = stack([(2.40, 0.20), (2.54, 0)]); r_bul, r_cards = _r[0], _r[1]
-    bullets(s, M, r_bul[0], 6.55, r_bul[1], [
-        ("Churn compounds.",
-         "26.54% of this customer base churned — 1,869 of 7,043 customers."),
-        ("Dashboards describe, they do not prioritise.",
-         "Knowing last quarter's churn rate does not tell a retention team whom to call today."),
-        ("Generic campaigns waste budget.",
-         "Blanket offers discount loyal customers and still miss the ones about to leave."),
-    ], pt=11.5, gap=8)
+    y = heading(s, "What RetainIQ adds to the existing project",
+                "Power BI gives a portfolio view; the Signal Ops Console adds customer-level scoring and review.")
 
-    qs = [("Who is likely to churn?", "Predicted churn probability per customer", ACTION),
-          ("Why are they at risk?", "Feature contributions behind each prediction", WARN),
-          ("What should we do?", "A retention action matched to the risk drivers", OK),
-          ("What is at stake?", "Monthly recurring revenue exposed in each risk band", BAD)]
-    card_h = (r_cards[1] - 0.14) / 2
-    for i, (q, sub, color) in enumerate(qs):
-        x = M + (i % 2) * 3.34
-        yy = r_cards[0] + (i // 2) * (card_h + 0.14)
-        rect(s, x, yy, 3.16, card_h, fill=PANEL, edge=LINE)
-        bar(s, x, yy + 0.16, 0.035, card_h - 0.32, color)
-        text(s, x + 0.22, yy + 0.18, 2.82, card_h - 0.34,
-             [{"t": q, "pt": 12, "color": TEXT, "bold": True, "space_after": 3},
-              {"t": sub, "pt": 9.8, "color": MUTED, "space_after": 0, "spacing": 1.14}])
+    col_gap = 0.22
+    col_w = (CW - col_gap) / 2
+    card_y, card_h = CONTENT_TOP, 3.75
+    comparison = [
+        (M, "EXISTING · POWER BI", "Portfolio reporting", ACTION, [
+            "Aggregates historical churn and portfolio KPIs.",
+            "Compares patterns across contract, tenure and service.",
+            "Answers: where is churn concentrated?",
+        ]),
+        (M + col_w + col_gap, "NEW · RETAINIQ SIGNAL OPS", "Customer-level decision support", OK, [
+            "Scores uploaded rows with the deployed Logistic Regression.",
+            "Returns churn probability and a Low / Medium / High risk tier.",
+            "Shows coefficient-based drivers and rule-based suggestions.",
+            "Supports bulk review and private report downloads.",
+        ]),
+    ]
+    for x, label, sub, color, items in comparison:
+        rect(s, x, card_y, col_w, card_h, fill=PANEL, edge=LINE)
+        bar(s, x, card_y, 0.045, card_h, color)
+        blocks = [
+            {"t": label, "pt": 10.8, "color": color, "bold": True, "mono": True,
+             "space_after": 8},
+            {"t": sub, "pt": 15, "color": TEXT, "bold": True, "space_after": 13},
+        ]
+        blocks += [{"t": f"•  {item}", "pt": 12.6, "color": TEXT,
+                    "space_after": 11, "spacing": 1.22} for item in items]
+        text(s, x + 0.24, card_y + 0.22, col_w - 0.48, card_h - 0.40, blocks)
 
-    text(s, 7.86, CONTENT_TOP + 0.20, 4.6, 0.30,
-         [{"t": "THE BASE RATE", "pt": 10.5, "color": MUTED, "bold": True, "mono": True,
-           "space_after": 0}])
-    chart_h = CAV - 0.44 - 0.66 - 0.14
-    image_fit(s, ASSETS / "chart_churn_split.png", 7.72, CONTENT_TOP + 0.48, 4.89, chart_h)
-    text(s, 7.86, CONTENT_TOP + CAV - 0.66, 4.6, 0.66,
-         [{"t": "1,869 churned · 5,174 retained of 7,043. Predicting \"nobody churns\" is "
-                "already 73.46% accurate — which is why accuracy alone decides nothing here.",
-           "pt": 10.5, "color": MUTED, "space_after": 0, "spacing": 1.16}])
+    banner_y = card_y + card_h + 0.16
+    rect(s, M, banner_y, CW, 0.80, fill=PANEL_2, edge=OK, edge_w=1.1)
+    text(s, M + 0.22, banner_y + 0.10, CW - 0.44, 0.62,
+         [{"t": "POWER BI monitors the portfolio. RETAINIQ prioritises new customer uploads for review.",
+           "pt": 14.4, "color": TEXT, "bold": True, "space_after": 6},
+          {"t": "Complementary layers: reporting → risk priority → driver → suggested next step.",
+           "pt": 11.2, "color": OK, "space_after": 0}])
+    text(s, M, banner_y + 0.88, CW, 0.30,
+         [{"t": "Decision support only: campaign uplift has not been measured; revenue figures are exposure, not confirmed savings.",
+           "pt": 10.3, "color": MUTED, "space_after": 0}])
     footer(s, n, phase=0)
     notes(s, """
-(1:05–1:55) Frame the pain, then the four questions — they structure the entire
-solution. Finish on the donut: "Notice the trap. If I predict nobody churns I'm
-73.46% accurate and completely useless. That single number is why no model in
-this deck is chosen on accuracy."
-That line earns credibility early and sets up Phase 07.
+(1:05–1:55) Make clear this is a comparison between two layers in this project,
+not a claim that RetainIQ replaces an external product. Power BI is useful for
+portfolio and segment monitoring: where is churn concentrated? The Signal Ops
+Console adds a different capability: upload customers, score each row with the
+deployed Logistic Regression, assign a risk tier, show coefficient-based drivers
+and a rule-based suggestion, then export the work for review.
+
+The two layers are complementary. Close with the caveat: recommendations are
+decision support; no campaign uplift has been measured, and revenue is framed as
+at risk rather than saved.
 """)
 
     # =========================================================== 04 PHASE 02

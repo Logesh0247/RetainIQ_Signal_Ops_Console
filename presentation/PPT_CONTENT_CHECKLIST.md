@@ -25,12 +25,14 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ The one-line thesis: probability → action, not just a classification score
 - ✅ Four-part structure of the talk
 
-## 3. Business problem (slide 3)
+## 3. Existing project layer vs RetainIQ (slide 3)
 
-- ✅ What churn costs; why dashboards describe but don't prioritise
-- ✅ Why blanket campaigns waste budget
-- ✅ **The four questions:** Who will churn? → Why? → What action? → What's at stake?
-- ✅ Base rate framing: predicting "nobody churns" is already 73.46% accurate
+- ✅ Placement: after the cycle map and before dataset collection
+- ✅ Power BI: portfolio-level churn KPIs and segment patterns
+- ✅ RetainIQ: per-customer Logistic Regression score, risk tier, coefficient drivers,
+  rule-based suggestion and bulk review/export
+- ✅ Difference: portfolio monitoring vs customer-level prioritisation
+- ✅ Honest limit: no campaign uplift measured; revenue remains at-risk exposure
 
 ## 4. Dataset (slide 4)
 
