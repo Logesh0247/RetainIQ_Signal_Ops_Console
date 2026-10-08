@@ -19,7 +19,9 @@ Run from the repository root:
 """
 from __future__ import annotations
 
+from io import BytesIO
 from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
 
 from PIL import Image, ImageFont
 from pptx import Presentation
@@ -324,6 +326,29 @@ def notes(slide, body):
 def picture_card(slide, path, x, y, w, h, pad=0.09, fill=WHITE, edge=LINE):
     rect(slide, x, y, w, h, fill=fill, edge=edge)
     image_fit(slide, path, x + pad, y + pad, w - 2 * pad, h - 2 * pad)
+
+
+def set_presentation_thumbnail(pptx_path: Path, cover_png: Path):
+    """Replace python-pptx's blank white package thumbnail with the rendered cover."""
+    with Image.open(cover_png) as cover:
+        cover = cover.convert("RGB")
+        cover.thumbnail((256, 144), Image.Resampling.LANCZOS)
+        canvas = Image.new("RGB", (256, 192), (INK[0], INK[1], INK[2]))
+        canvas.paste(cover, ((256 - cover.width) // 2, (192 - cover.height) // 2))
+        thumb = BytesIO()
+        canvas.save(thumb, format="JPEG", quality=92, optimize=True)
+        thumb_bytes = thumb.getvalue()
+
+    temp_path = pptx_path.with_name(pptx_path.stem + ".thumbnail.tmp.pptx")
+    with ZipFile(pptx_path, "r") as src:
+        names = src.namelist()
+        if "docProps/thumbnail.jpeg" not in names:
+            raise ValueError("PPTX package is missing docProps/thumbnail.jpeg")
+        with ZipFile(temp_path, "w", ZIP_DEFLATED) as dst:
+            for item in src.infolist():
+                data = thumb_bytes if item.filename == "docProps/thumbnail.jpeg" else src.read(item.filename)
+                dst.writestr(item, data)
+    temp_path.replace(pptx_path)
 
 
 def signal_meter(slide, x, y, filled=3, total=5, scale=1.0, label=None, color=OK):
@@ -1387,6 +1412,11 @@ LIKELY QUESTIONS
 
     # Slide 21 is the final presentation slide; the five appendix slides are omitted.
     prs.save(OUT)
+    # python-pptx writes a blank white default thumbnail; replace it with the real cover
+    # so file browsers and previews show the deck rather than a blank white tile.
+    from preview_deck import render as render_preview
+    cover_png = render_preview(Presentation(str(OUT)).slides[0], 1)
+    set_presentation_thumbnail(OUT, cover_png)
     return OUT
 
 def main():
