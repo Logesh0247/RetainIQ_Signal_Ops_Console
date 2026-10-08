@@ -466,66 +466,7 @@ this deck is chosen on accuracy."
 That line earns credibility early and sets up Phase 07.
 """)
 
-    # =========================================================== 04 PROJECT LAYERS
-    n += 1
-    s = add_slide(prs)
-    eyebrow(s, "PHASE 01  ·  PROJECT CONTEXT")
-    y = heading(s, "What RetainIQ adds to the existing project",
-                "Power BI gives a portfolio view; the Signal Ops Console adds customer-level scoring and review.")
-
-    col_gap = 0.22
-    col_w = (CW - col_gap) / 2
-    card_y, card_h = CONTENT_TOP, 3.75
-    comparison = [
-        (M, "EXISTING · POWER BI", "Portfolio reporting", ACTION, [
-            "Aggregates historical churn and portfolio KPIs.",
-            "Compares patterns across contract, tenure and service.",
-            "Answers: where is churn concentrated?",
-        ]),
-        (M + col_w + col_gap, "NEW · RETAINIQ SIGNAL OPS", "Customer-level decision support", OK, [
-            "Scores uploaded rows with the deployed Logistic Regression.",
-            "Returns churn probability and a Low / Medium / High risk tier.",
-            "Shows coefficient-based drivers and rule-based suggestions.",
-            "Supports bulk review and private report downloads.",
-        ]),
-    ]
-    for x, label, sub, color, items in comparison:
-        rect(s, x, card_y, col_w, card_h, fill=PANEL, edge=LINE)
-        bar(s, x, card_y, 0.045, card_h, color)
-        blocks = [
-            {"t": label, "pt": 10.8, "color": color, "bold": True, "mono": True,
-             "space_after": 8},
-            {"t": sub, "pt": 15, "color": TEXT, "bold": True, "space_after": 13},
-        ]
-        blocks += [{"t": f"•  {item}", "pt": 12.6, "color": TEXT,
-                    "space_after": 11, "spacing": 1.22} for item in items]
-        text(s, x + 0.24, card_y + 0.22, col_w - 0.48, card_h - 0.40, blocks)
-
-    banner_y = card_y + card_h + 0.16
-    rect(s, M, banner_y, CW, 0.80, fill=PANEL_2, edge=OK, edge_w=1.1)
-    text(s, M + 0.22, banner_y + 0.10, CW - 0.44, 0.62,
-         [{"t": "POWER BI monitors the portfolio. RETAINIQ prioritises new customer uploads for review.",
-           "pt": 14.4, "color": TEXT, "bold": True, "space_after": 6},
-          {"t": "Complementary layers: reporting → risk priority → driver → suggested next step.",
-           "pt": 11.2, "color": OK, "space_after": 0}])
-    text(s, M, banner_y + 0.88, CW, 0.30,
-         [{"t": "Decision support only: campaign uplift has not been measured; revenue figures are exposure, not confirmed savings.",
-           "pt": 10.3, "color": MUTED, "space_after": 0}])
-    footer(s, n, phase=0)
-    notes(s, """
-(1:55–2:30) Make clear this is a comparison between two layers in this project,
-not a claim that RetainIQ replaces an external product. Power BI is useful for
-portfolio and segment monitoring: where is churn concentrated? The Signal Ops
-Console adds a different capability: upload customers, score each row with the
-deployed Logistic Regression, assign a risk tier, show coefficient-based drivers
-and a rule-based suggestion, then export the work for review.
-
-The two layers are complementary. Close with the caveat: recommendations are
-decision support; no campaign uplift has been measured, and revenue is framed as
-at risk rather than saved.
-""")
-
-    # =========================================================== 05 PHASE 02
+    # =========================================================== 04 PHASE 02
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 02  ·  DATA COLLECTION")
@@ -564,14 +505,14 @@ at risk rather than saved.
             "cannot drift apart. There is a unit test for exactly this.", OK)
     footer(s, n, phase=1)
     notes(s, """
-(2:30–3:10) Quick pass on the tiles. Spend the time on the right-hand callouts:
+(1:55–2:35) Quick pass on the tiles. Spend the time on the right-hand callouts:
 "the split is stratified, so both halves carry exactly the same 26.54% churn rate
 — the model never sees a distorted class balance."
 And the parity point: "the 30-column contract is saved next to the model and
 tested, so the app cannot silently score on the wrong schema."
 """)
 
-    # =========================================================== 06 PHASE 03
+    # =========================================================== 05 PHASE 03
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 03  ·  DATA CLEANING & PREPROCESSING")
@@ -611,14 +552,14 @@ tested, so the app cannot silently score on the wrong schema."
     ], pt=11.0, gap=9)
     footer(s, n, phase=2)
     notes(s, """
-(3:10–3:55) Walk the four boxes quickly, then slow down on the leakage callout —
+(2:35–3:20) Walk the four boxes quickly, then slow down on the leakage callout —
 reviewers consistently reward this. "Churn Score and Churn Reason are the
 dataset's most seductive columns and they're poison: they only exist after the
 customer has left. I dropped them. That is why 80% here is a real 80%."
 One sentence on encoding and move on.
 """)
 
-    # =========================================================== 07 PHASE 04
+    # =========================================================== 06 PHASE 04
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 04  ·  EXPLORATORY DATA ANALYSIS")
@@ -650,7 +591,7 @@ One sentence on encoding and move on.
               {"t": b, "pt": 10.2, "color": TEXT, "space_after": 0, "spacing": 1.18}])
     footer(s, n, phase=3)
     notes(s, """
-(3:55–4:40) Three takeaways only, no bar-by-bar narration.
+(3:20–4:05) Three takeaways only, no bar-by-bar narration.
 "Month-to-month is a 15× risk multiplier."
 "Risk is front-loaded — year one is where retention money belongs."
 "And the story is service experience, not just price: fiber optic, no security,
@@ -659,7 +600,7 @@ Bridge out: "these are the patterns the model later recovered on its own — and
 what the recommendation engine acts on."
 """)
 
-    # =========================================================== 08 PHASE 05
+    # =========================================================== 07 PHASE 05
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 05  ·  FEATURE ENGINEERING")
@@ -705,7 +646,7 @@ what the recommendation engine acts on."
            "space_after": 0, "spacing": 1.18}])
     footer(s, n, phase=4)
     notes(s, """
-(4:40–5:10) Short slide, but it answers a question examiners like: "why did you
+(4:05–4:35) Short slide, but it answers a question examiners like: "why did you
 encode it that way?"
 "Three continuous measures. Everything else is a yes/no flag — because numbering
 DSL as 1 and Fiber as 2 would invent an ordering that isn't real."
@@ -714,7 +655,7 @@ checked at scoring time, so a schema mismatch fails loudly instead of silently
 producing garbage."
 """)
 
-    # =========================================================== 09 PHASE 06
+    # =========================================================== 08 PHASE 06
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 06  ·  MODEL DEVELOPMENT")
@@ -743,7 +684,7 @@ producing garbage."
             "recorded, and the winner was chosen on F1 and ROC-AUC, never accuracy.")
     footer(s, n, phase=5)
     notes(s, """
-(5:10–5:40) "Same features, same split, same code path — the only thing that
+(4:35–5:05) "Same features, same split, same code path — the only thing that
 changes is the algorithm."
 Then the key observation: Logistic Regression leads on F1 and ROC-AUC, with
 LightGBM a close second. Say why it matters: "churn here is largely linear in the
@@ -751,7 +692,7 @@ encoded features, so the simplest model wins — and that also buys me
 explainability for free." That sets up Phase 09.
 """)
 
-    # =========================================================== 10 PHASE 07
+    # =========================================================== 09 PHASE 07
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 07  ·  MODEL EVALUATION")
@@ -782,7 +723,7 @@ explainability for free." That sets up Phase 09.
            "pt": 10.8, "color": MUTED, "space_after": 0, "spacing": 1.16}])
     footer(s, n, phase=6)
     notes(s, """
-(5:40–6:30) The credibility slide — slow down.
+(5:05–5:55) The credibility slide — slow down.
 "1,409 customers held back entirely. 919 stayed and were correctly left alone;
 116 were flagged unnecessarily; 161 churners were missed; 213 caught."
 Then the stability point, which most projects never show: "five-fold
@@ -792,7 +733,7 @@ Then own the weakness: "recall is 56.95% — that is the one number I would fix
 first, and I'll show you exactly how on the next slide."
 """)
 
-    # =========================================================== 11 PHASE 08a
+    # =========================================================== 10 PHASE 08a
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 08  ·  MODEL SELECTION")
@@ -835,14 +776,14 @@ first, and I'll show you exactly how on the next slide."
             "explainable, which the next phase depends on.", OK)
     footer(s, n, phase=7)
     notes(s, """
-(6:30–7:00) "Four algorithms, identical treatment. Look at how close they are —
+(5:55–6:25) "Four algorithms, identical treatment. Look at how close they are —
 LightGBM is within 0.28 of a point on accuracy. If I had picked on accuracy I'd
 have picked a harder model to explain, for no real gain."
 Then state the rule: "I selected on F1 and ROC-AUC, because what matters
 operationally is ranking risk, not classifying the majority correctly."
 """)
 
-    # =========================================================== 12 PHASE 08b
+    # =========================================================== 11 PHASE 08b
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 08  ·  MODEL SELECTION  ·  THE OPERATING POINT")
@@ -871,7 +812,7 @@ operationally is ranking risk, not classifying the majority correctly."
             "correctly — the 0.5 cut-off was throwing churners away.", WARN)
     footer(s, n, phase=7)
     notes(s, """
-(7:00–7:40) This is the strongest slide in the deck — give it time.
+(6:25–7:05) This is the strongest slide in the deck — give it time.
 "0.5 is a library default, not a business decision. So I measured the whole range."
 Point at the crossing: "at 0.35 I catch 71.7% of churners instead of 57% — and F1
 actually goes UP, not down."
@@ -884,7 +825,7 @@ business decision about the cost of a wasted offer versus a lost customer — no
 something I should silently change."
 """)
 
-    # =========================================================== 13 PHASE 09
+    # =========================================================== 12 PHASE 09
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 09  ·  EXPLAINABILITY")
@@ -913,7 +854,7 @@ something I should silently change."
             "costs nothing at request time.", WARN)
     footer(s, n, phase=8)
     notes(s, """
-(7:40–8:15) Left chart: "this is who the high-risk band is — every one of them is
+(7:05–7:40) Left chart: "this is who the high-risk band is — every one of them is
 month-to-month, 91% are on fiber optic, 95% have no online security, and they
 average under ten months of tenure."
 Right: "and for a single customer the app names which of those factors pushed
@@ -923,7 +864,7 @@ deployed model is linear, so I explain it with coefficients — same information
 no runtime cost." Do not overclaim here.
 """)
 
-    # =========================================================== 14 PHASE 10
+    # =========================================================== 13 PHASE 10
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 10  ·  RISK SEGMENTATION")
@@ -968,7 +909,7 @@ no runtime cost." Do not overclaim here.
            "spacing": 1.18}])
     footer(s, n, phase=9)
     notes(s, """
-(8:15–8:50) "A probability isn't something a retention agent can act on, so I cut
+(7:40–8:15) "A probability isn't something a retention agent can act on, so I cut
 it into three bands."
 Then the validation, which is the point of the slide: "I checked the bands against
 the real churn labels. Low risk actually churns 9.5%, medium 42%, high 73%. The
@@ -976,7 +917,7 @@ band is a genuine ordering of risk, not a cosmetic split."
 Close operationally: "the team starts with 1,135 customers instead of 7,043."
 """)
 
-    # =========================================================== 15 PHASE 11
+    # =========================================================== 14 PHASE 11
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 11  ·  RETENTION INTELLIGENCE")
@@ -1012,14 +953,14 @@ Close operationally: "the team starts with 1,135 customers instead of 7,043."
            "color": TEXT, "space_after": 0, "spacing": 1.18}])
     footer(s, n, phase=10)
     notes(s, """
-(8:50–9:25) "Prediction alone doesn't retain anyone."
+(8:15–8:50) "Prediction alone doesn't retain anyone."
 Show the offer list — note the biggest group is a contract-upgrade nudge, which
 follows directly from the Phase 04 finding about month-to-month risk.
 Then be precise about money: "this is monthly revenue at risk — exposure, $92,539
 a month sitting in the high-risk band. I deliberately do not call it savings."
 """)
 
-    # =========================================================== 16 PHASE 12
+    # =========================================================== 15 PHASE 12
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 12  ·  BUSINESS INTELLIGENCE")
@@ -1056,7 +997,7 @@ a month sitting in the high-risk band. I deliberately do not call it savings."
            "href": PBIT_URL}], anchor=MSO_ANCHOR.MIDDLE, audit=False)
     footer(s, n, phase=11)
     notes(s, """
-(9:25–9:50) "The machine learning app answers what is likely to happen. Power BI
+(8:50–9:15) "The machine learning app answers what is likely to happen. Power BI
 answers what already happened and why — and it's what a non-technical
 stakeholder actually opens."
 Four pages: executive overview, customer insights, risk intelligence, retention
@@ -1064,7 +1005,7 @@ strategy. One sentence each, don't linger. Point out the underlined .pbit link �
 it opens the reusable report template in the project repository.
 """)
 
-    # =========================================================== 17 PHASE 13
+    # =========================================================== 16 PHASE 13
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 13  ·  WEB APPLICATION")
@@ -1093,7 +1034,7 @@ it opens the reusable report template in the project repository.
            "align": PP_ALIGN.RIGHT}], audit=False)
     footer(s, n, phase=12)
     notes(s, """
-(9:50–10:20) This is the demo slide. If the live site is warm, switch to it for
+(9:15–9:45) This is the demo slide. If the live site is warm, switch to it for
 thirty seconds; otherwise walk the screenshots.
 "Upload a portfolio, validate it before scoring, then read churn rate, risk
 distribution and revenue at risk — and drill into any single customer."
@@ -1102,7 +1043,7 @@ a signed cookie, so users never see each other's data — that has its own unit
 test."
 """)
 
-    # =========================================================== 18 PHASE 14
+    # =========================================================== 17 PHASE 14
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 14  ·  DEPLOYMENT")
@@ -1178,7 +1119,7 @@ test."
 
     footer(s, n, phase=13)
     notes(s, """
-(10:20–10:45) Don't list technology here — that's the next slide. This slide is
+(9:45–10:10) Don't list technology here — that's the next slide. This slide is
 about the production problems, which is what actually separates a notebook from
 a deployed service.
 "Four things broke or nearly broke when this left my laptop: slow scoring hitting
@@ -1189,7 +1130,7 @@ the app has been idle, you'll wait about a minute for it to wake up. I'll warm i
 before we start."
 """)
 
-    # =========================================================== 19 TECH STACK
+    # =========================================================== 18 TECH STACK
     n += 1
     s = add_slide(prs)
     eyebrow(s, "TECHNOLOGY STACK")
@@ -1253,7 +1194,7 @@ before we start."
 
     footer(s, n, complete_through=len(PHASES))
     notes(s, """
-(10:45–11:10) Use the logos as visual anchors; do not read the lists line by line.
+(10:10–10:35) Use the logos as visual anchors; do not read the lists line by line.
 "Python, pandas and NumPy handle the data. Scikit-learn trains the deployed
 Logistic Regression; Flask and FastAPI expose it; Docker, Render and GitHub carry
 it to production; Power BI presents the business view."
@@ -1262,7 +1203,7 @@ Logistic Regression coefficients. One shared Python package keeps training and
 serving on the same preprocessing and scoring path.
 """)
 
-    # =========================================================== 20 RESPONSIBLE AI
+    # =========================================================== 19 RESPONSIBLE AI
     n += 1
     s = add_slide(prs)
     eyebrow(s, "RESPONSIBLE AI, LIMITS & THE NEXT CYCLE")
@@ -1317,7 +1258,7 @@ serving on the same preprocessing and scoring path.
            "spacing": 1.16}])
     footer(s, n, complete_through=len(PHASES))
     notes(s, """
-(11:10–11:40) Most students hide this slide. Put it up and read it.
+(10:35–11:05) Most students hide this slide. Put it up and read it.
 "Three things I would not do with this model today. I wouldn't trust it on a
 different market — it has only ever seen one telecom. I wouldn't quote revenue as
 savings, only as exposure. And I wouldn't ship a retention campaign aimed at
@@ -1328,7 +1269,7 @@ catches 71.7%. That's the next cycle, which starts back at Phase 02 with drift
 monitoring."
 """)
 
-    # =========================================================== 21 THANK YOU
+    # =========================================================== 20 THANK YOU
     n += 1
     s = add_slide(prs)
     bar(s, 0, 0, SW, 0.085, OK)
@@ -1387,7 +1328,7 @@ monitoring."
                 "80.34% accuracy  ·  84.91% ROC-AUC",
            "pt": 10.5, "color": MUTED, "mono": True, "space_after": 0}])
     notes(s, """
-CLOSING (11:40–12:05) Leave this slide up for questions. It puts the live URL and
+CLOSING (11:05–11:30) Leave this slide up for questions. It puts the live URL and
 a scannable QR in front of the examiner and ends on the thesis, not a tool list.
 "The contribution isn't the 80% — it's that a probability becomes a prioritised,
 explained, costed action, in a product a retention team can actually open. Thank
@@ -1406,7 +1347,7 @@ LIKELY QUESTIONS
   post-outcome fields and were dropped before training.
 """)
 
-    # Slide 21 is the final content slide; the five appendix slides are omitted.
+    # Slide 20 is the final content slide; the five appendix slides are omitted.
     prs.save(OUT)
     return OUT
 
