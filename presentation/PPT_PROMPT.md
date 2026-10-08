@@ -148,10 +148,13 @@ Cleaning → EDA → Feature Engineering → Model Development → Model Evaluat
 Selection → Explainability → Risk Segmentation → Retention Intelligence → Business
 Intelligence → Web Application → Deployment. Colour the arcs blue → amber → green.
 
-**Slide 3 — PHASE 01 · Business Understanding.** What churn costs; why dashboards describe
-but cannot predict; why blanket campaigns waste budget. The four questions the platform
-answers: *Who will churn? Why? What should we do? What is at stake?* Close with the base
-rate trap: predicting "nobody churns" is already 73.46% accurate.
+**Slide 3 — PHASE 01 · Business Understanding.** Make this slide about the business
+problem only. Title it **"Business Understanding: retention is still reactive."** State
+that 26.54% churned (1,869 of 7,043), historical reporting is backward-looking, and
+one-size-fits-all discounts can waste budget while still missing likely churners. Frame
+the four questions: *Who will churn? Why? What should we do? What is at stake?* Close with
+the base-rate trap: predicting "nobody churns" is already 73.46% accurate. Keep all
+Power BI-versus-RetainIQ roles on slide 4.
 
 **Slide 4 — What RetainIQ adds to the existing project.** Give this its own slide,
 separate from Business Understanding. **Power BI** provides portfolio-level historical

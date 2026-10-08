@@ -28,8 +28,9 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 
 ## 3. Business problem (slide 3)
 
-- ✅ What churn costs; why dashboards describe but don't prioritise
-- ✅ Why blanket campaigns waste budget
+- ✅ 26.54% churn makes retention a material business problem
+- ✅ Historical reporting is backward-looking: it shows who left, not who needs attention today
+- ✅ One-size-fits-all discounts can reward customers who would stay and still miss likely churners
 - ✅ **The four questions:** Who will churn? → Why? → What action? → What's at stake?
 - ✅ Base-rate framing: predicting "nobody churns" is already 73.46% accurate
 

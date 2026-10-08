@@ -447,16 +447,16 @@ Promise the structure and then keep it. Do not narrate every box.
     n += 1
     s = add_slide(prs)
     eyebrow(s, "PHASE 01  ·  BUSINESS UNDERSTANDING")
-    y = heading(s, "The problem: retention is still reactive",
-                "Reports explain what happened. They do not say who leaves next.")
+    y = heading(s, "Business Understanding: retention is still reactive",
+                "Churn is high, and teams often learn who left only after the fact.")
     _r = stack([(2.40, 0.20), (2.54, 0)]); r_bul, r_cards = _r[0], _r[1]
     bullets(s, M, r_bul[0], 6.55, r_bul[1], [
-        ("Churn compounds.",
+        ("Churn is a material business problem.",
          "26.54% of this customer base churned — 1,869 of 7,043 customers."),
-        ("Dashboards describe, they do not prioritise.",
-         "Knowing last quarter's churn rate does not tell a retention team whom to call today."),
-        ("Generic campaigns waste budget.",
-         "Blanket offers discount loyal customers and still miss the ones about to leave."),
+        ("Current retention is backward-looking.",
+         "Historical reporting shows who already left, not which customers need attention today."),
+        ("One-size-fits-all offers waste budget.",
+         "Discounts can go to customers who would stay, while still missing those likely to leave."),
     ], pt=11.5, gap=8)
 
     qs = [("Who is likely to churn?", "Predicted churn probability per customer", ACTION),
