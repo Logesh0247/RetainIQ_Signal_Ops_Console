@@ -698,16 +698,18 @@ def chart_cycle():
     pad = 2.0
     usable = 100 - pad * 2
     box_h = 9.0
-    label_gap = 1.6
+    label_gap = 1.8
 
-    # explicit vertical layout: label line, then the row of boxes, then a gap
+    # Keep a clear gutter between each row of phase boxes and its act label.
+    # The following row then starts far enough below the label to avoid crowding.
     tops = [44.5, 29.5, 14.5]
 
     for (act, arc_name, color, phases), top in zip(arcs, tops):
         y = top - box_h
-        ax.text(pad, top - box_h - 0.30, act, color=color, fontsize=11, fontweight="bold",
+        label_y = y - label_gap
+        ax.text(pad, label_y, act, color=color, fontsize=11, fontweight="bold",
                 va="top")
-        ax.text(100 - pad, top - box_h - 0.30, arc_name, color=MUTED, fontsize=10,
+        ax.text(100 - pad, label_y, arc_name, color=MUTED, fontsize=10,
                 va="top", ha="right", fontweight="bold")
 
         n = len(phases)
