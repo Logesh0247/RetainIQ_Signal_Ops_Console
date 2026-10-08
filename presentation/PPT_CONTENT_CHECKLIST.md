@@ -2,10 +2,10 @@
 
 Every detail the deck must contain, with the verified value for each.
 
-Status: ✅ = already in `RetainIQ_Project_Review.pptx` (21 presentation slides: the
-original 20-slide review deck, with its final five appendix pages omitted, plus a
-new comparison slide). The business problem remains slide 3; the Power BI vs
-RetainIQ comparison is slide 4, before the dataset section on slide 5. Every
+Status: ✅ = already in `RetainIQ_Project_Review.pptx` (20 presentation slides: the
+original review deck's final slide and final five appendix pages are omitted, and
+one Power BI vs RetainIQ comparison slide has been added). The business problem
+remains slide 3; the comparison is slide 4, before the dataset on slide 5. Every
 slide is laid out on the vertical fill engine in
 `presentation/build_deck.py` — kicker/heading → content band (1.66in–6.80in) →
 rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
@@ -168,27 +168,12 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Counterfactual / what-if explanations
 - ✅ CRM integration and A/B testing of offers
 
-## 19. Closing — link + QR (slide 21)
-
-- ✅ Built: clickable live-app URL, verified live-app QR, clickable repository URL,
-  repository QR, contribution line, questions prompt
-
-Additional content it carries:
-
-- Live application URL printed in full: `retainiq-predictive-customer-retention-zq6x.onrender.com`
-- **QR code for the live app** (must be verified by decoding the rendered PNG)
-- QR code for the repository as a secondary code
-- Contribution statement: classification score → retention intelligence workflow
-- Thank-you / questions prompt
-- Presenter credit line with headline metrics
-- Notes telling the presenter to offer a live demo from this slide
-
 ---
 
 ## Presentation mechanics (not slide content, but required)
 
-- ✅ Speaker notes on every slide with timings totalling about 12 minutes
-- ✅ 21 presentation slides: the original final-five appendix pages remain omitted; one comparison slide has been added.
+- ✅ Speaker notes on every slide with timings totalling about 11 minutes 40 seconds
+- ✅ 20 presentation slides: the comparison is added as slide 4; the final closing page and original final-five appendix pages are omitted.
 - ✅ Section numbering and slide numbers
 - ✅ Consistent dark "Signal Ops" theme matching the live product
 
