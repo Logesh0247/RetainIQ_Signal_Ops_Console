@@ -1236,7 +1236,7 @@ monitoring."
     rect(s, M, r_pan[0], 5.82, r_pan[1], fill=PANEL, edge=OK, edge_w=1.4)
     text(s, M + 0.28, r_pan[0] + 0.24, 5.26, r_pan[1] - 0.48,
          [{"t": "LIVE APPLICATION", "pt": 10.5, "color": OK, "bold": True, "mono": True,
-           "space_after": 8},
+           "space_after": 8, "href": LIVE_URL},
           {"t": LIVE_URL_DISPLAY, "pt": 11, "color": ACTION, "bold": True,
            "space_after": 10, "spacing": 1.16, "href": LIVE_URL},
           {"t": "Bulk score a customer CSV, read the dashboard, and download a private "
@@ -1244,7 +1244,7 @@ monitoring."
                 "live — the same code paths that produced every figure in this deck.",
            "pt": 10.8, "color": MUTED, "space_after": 12, "spacing": 1.20},
           {"t": "SOURCE CODE", "pt": 10.5, "color": ACTION, "bold": True, "mono": True,
-           "space_after": 5},
+           "space_after": 5, "href": REPO_URL},
           {"t": REPO_DISPLAY, "pt": 10.6, "color": ACTION, "mono": True,
            "space_after": 12, "spacing": 1.16, "href": REPO_URL},
           {"t": "Notebooks 01–09, the Flask console, the FastAPI wrapper and the "
