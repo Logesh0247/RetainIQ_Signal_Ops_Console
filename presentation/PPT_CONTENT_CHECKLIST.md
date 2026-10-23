@@ -49,7 +49,8 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ 7,043 customers · 34 raw features · 30 final ML features
 - ✅ Target: Churn Label (binary)
 - ✅ Class balance: 1,869 churned (26.54%) / 5,174 stayed (73.46%)
-- ✅ Split: 80/20 stratified → 5,634 train / 1,409 test (both exactly 26.54%)
+- ✅ Split: 80/20 stratified → 5,634 train / 1,409 test (both round to 26.54%)
+- ⚠️ The 1,409-row test split was held out from fitting but used to compare/select models; do not call it an untouched final or external validation set
 - ✅ Feature groups: profile, services, contract & billing, value
 - ✅ **Leakage control:** dropped Churn Score, Churn Reason, Churn Category, Customer Status
 - ✅ Train/serve parity: 30 columns frozen in `feature_columns.pkl`, unit-tested
@@ -70,7 +71,7 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ Avg monthly charges: churned $74.44 vs stayed $61.27
 - ✅ Internet service: fiber optic 41.9% vs DSL 19.0% vs none 7.4%
 - ✅ Payment method: electronic check 45.3% vs auto-pay ~15–17%
-- ✅ Senior citizens: 41.7% vs 23.6%
+- ✅ Senior vs non-senior churn: 41.7% vs 23.6% (1.77×); this is an observed group-rate gap, not evidence of measured model bias
 - ✅ Missing add-ons: no online security 41.8%, no tech support 41.6%
 
 ## 8. Model development (slide 9)
@@ -100,7 +101,7 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 
 - ✅ Thresholds: < 30% low · 30–60% medium · ≥ 60% high
 - ✅ Band sizes: 4,435 low · 1,473 medium · 1,135 high
-- ✅ **Validation against real labels:** actual churn 9.5% / 42.0% / 73.0%
+- ✅ **In-dataset descriptive check:** observed churn 9.5% / 42.0% / 73.0% across the full portfolio; not independent or external validation
 - ✅ Operational payoff: 1,135 to prioritise instead of 7,043
 
 ## 11. Explainability (slide 13)
@@ -158,6 +159,7 @@ rail — so no slide ends early. Verify with `audit_deck.py` (geometry),
 - ✅ No live behavioural feed, no drift monitoring, no auto-retraining
 - ✅ Probabilities are not guarantees
 - ✅ Revenue is exposure, not realised savings
+- ⚠️ Senior vs non-senior churn differs (41.7% vs 23.6%); no subgroup performance or offer-allocation audit has been run, so do not claim demonstrated model bias
 
 ## 18. Future work (slide 20)
 

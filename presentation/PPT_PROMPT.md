@@ -142,7 +142,7 @@ test accuracy · `84.91%` ROC-AUC · `7,043` customers scored · `$92,539` month
 risk. Presenter: Logesh S., B.Sc. Data Science. Live app URL and repository URL at the
 foot. Signal-strength meter motif, strong.
 
-**Slide 2 — The development cycle.** The map for everything that follows. Draw the
+**Slide 2 — The development cycle.** Map the core project workflow. Draw the
 fourteen-phase cycle as a clean horizontal flow in three arcs — Data (1–5), Modelling
 (6–8), Intelligence & Delivery (9–14): Business Understanding → Data Collection → Data
 Cleaning → EDA → Feature Engineering → Model Development → Model Evaluation → Model
@@ -167,9 +167,10 @@ figures are exposure, not confirmed savings.
 
 **Slide 5 — PHASE 02 · Data Collection.** IBM Telco Customer Churn dataset. KPI tiles:
 `7,043` customers · `34` raw features · `30` engineered features · `26.54%` churn rate ·
-`80/20` stratified split (5,634 train / 1,409 test, both exactly 26.54% churn). A donut
-showing 1,869 churned vs 5,174 retained. Feature groups: profile, services, contract &
-billing, value.
+`80/20` stratified split (5,634 train / 1,409 test; both round to 26.54% churn). A donut
+showing 1,869 churned vs 5,174 retained. State that the test rows were held out from fitting
+but used to compare candidate models, so this is not a final untouched or external test.
+Feature groups: profile, services, contract & billing, value.
 
 **Slide 6 — PHASE 03 · Data Cleaning & Preprocessing.** Cleaning steps as a horizontal
 flow: raw upload → clean → encode → 30 features. Two callouts: **leakage prevention** —
@@ -233,9 +234,9 @@ coefficient × feature value. State SHAP precisely: explored during research, pr
 explanation uses the linear model's coefficients.
 
 **Slide 14 — PHASE 10 · Risk Segmentation.** Bands: `< 30%` Low · `30–60%` Medium ·
-`≥ 60%` High. Sizes: 4,435 / 1,473 / 1,135. Validation against real outcomes: actual churn
-**9.5% → 42.0% → 73.0%**, so the bands genuinely order risk. Operational payoff: prioritise
-1,135 customers instead of 7,043.
+`≥ 60%` High. Sizes: 4,435 / 1,473 / 1,135. In-dataset descriptive check: observed churn
+**9.5% → 42.0% → 73.0%** across the full portfolio. State that this is not independent or
+external validation. Operational payoff: prioritise 1,135 customers instead of 7,043.
 
 **Slide 15 — PHASE 11 · Retention Intelligence.** 2,608 at-risk customers each received a
 specific action: Promote Long-Term Contract 792 · 5% Discount 663 · 15% Discount 658 ·
@@ -270,10 +271,12 @@ app and the API.
 **Slide 20 — Responsible AI, limitations & the next cycle.** Three panels. *Limitations:*
 historical data from one telecom; 56.95% recall at the deployed threshold; no live
 behavioural feed, drift monitoring or automatic retraining; probabilities are not
-guarantees. *Fairness note:* senior citizens churn at 41.7%, so the model may systematically
-target them — no bias audit has been run. *Cost of errors:* a wasted offer is cheap, a lost
-customer is expensive — which is the economic reason the operating threshold is a business
-decision, not a technical default. Close by looping back to Phase 02: drift detection and
+guarantees. *Fairness note:* senior-customer churn is 41.7% vs 23.6% for non-seniors
+(1.77×); the overall rate is 26.54%. Senior status is a model input, but whether scores or
+offers are unevenly concentrated has not been audited. Do not claim demonstrated bias.
+*Cost of errors:* a wasted offer is cheap, a lost customer is expensive — which is the
+economic reason the operating threshold is a business decision, not a technical default.
+Close by looping back to Phase 02: drift detection and
 scheduled retraining begin the next cycle.
 
 **Slide 21 — See it running: demo and project links.** Keep the live application URL in

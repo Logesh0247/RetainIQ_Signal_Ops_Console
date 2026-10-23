@@ -462,7 +462,7 @@ Then move — do not read the tiles.
     s = add_slide(prs)
     eyebrow(s, "THE DEVELOPMENT CYCLE")
     y = heading(s, "Fourteen phases, three acts",
-                "This is the map for the whole talk — every slide that follows is one of these boxes")
+                "The core project workflow: fourteen phases grouped into three acts")
     _r = stack([(4.38, 0.08), (0.68, 0)]); r_chart, r_cap = _r[0], _r[1]
     image_fit(s, ASSETS / "chart_cycle.png", M, r_chart[0], CW, img_h(ASSETS / "chart_cycle.png", CW))
     callout(s, M, r_cap[0], CW, r_cap[1], "HOW TO READ THE DECK",
@@ -470,8 +470,9 @@ Then move — do not read the tiles.
             "marks your current position.", OK)
     footer(s, n)
     notes(s, """
-(0:35–1:05) "Everything I show you maps to one of these fourteen boxes, and the
-boxes group into three acts."
+(0:35–1:05) "The core project workflow maps to these fourteen phases, grouped into
+three acts. The comparison, responsibility, demo and closing slides frame that
+technical journey."
 Point along the arcs: "Act one, the signal fades — the problem and the data. Act
 two, reading the signal — the model work. Act three — what it's worth and the
 product."
@@ -617,19 +618,22 @@ to the data that feeds the scoring workflow.
            "pt": 11.3, "color": MUTED, "space_after": 0, "space_before": 8}])
 
     callout(s, 6.85, yy, 5.86, r_body[1] / 2 - 0.08, "CLASS BALANCE AND THE SPLIT",
-            "1,869 churned against 5,174 retained. The split is stratified, so both "
-            "halves carry the identical 26.54% churn rate: 5,634 rows train, 1,409 "
-            "rows are held back and touched only once.", ACTION)
+            "1,869 churned and 5,174 retained. Stratified 80/20 split: 5,634 train and "
+            "1,409 test rows; both round to 26.54% churn. The test rows were held out "
+            "from fitting, then used to compare candidate models—so this is not a final "
+            "untouched validation set.", ACTION)
     callout(s, 6.85, yy + r_body[1] / 2 + 0.08, 5.86, r_body[1] / 2 - 0.08, "TRAIN / SERVE PARITY",
             "The 30 encoded columns are frozen in feature_columns.pkl and rebuilt by "
             "the same preprocessing code for every upload — training and live scoring "
             "cannot drift apart. There is a unit test for exactly this.", OK)
     footer(s, n, phase=1)
     notes(s, """
-(2:20–3:00) Quick pass on the tiles. Spend the time on the right-hand callouts:
-"the split is stratified, so both halves carry exactly the same 26.54% churn rate
-— the model never sees a distorted class balance."
-And the parity point: "the 30-column contract is saved next to the model and
+(2:20–3:00) Quick pass on the tiles. Say that both partitions round to 26.54%
+churn because the split is stratified. Be precise: the 1,409 test rows were held
+out from fitting, but were used to compare and select candidate models. This is
+internal evaluation, not an untouched final or external test. A future nested-CV
+or external cohort would give a stronger final estimate.
+Then the parity point: "the 30-column contract is saved next to the model and
 tested, so the app cannot silently score on the wrong schema."
 """)
 
@@ -1014,28 +1018,29 @@ no runtime cost." Do not overclaim here.
     p1, p2 = _p[0], _p[1]
     rect(s, px, p1[0], pw, p1[1], fill=PANEL_2, edge=OK, edge_w=1.2)
     text(s, px + 0.20, p1[0] + 0.16, pw - 0.40, p1[1] - 0.32,
-         [{"t": "VALIDATION", "pt": 10.5, "color": OK, "bold": True, "mono": True,
+         [{"t": "IN-DATASET CHECK", "pt": 10.5, "color": OK, "bold": True, "mono": True,
            "space_after": 5},
-          {"t": "The bands track reality: actual churn is 9.5% in low risk, 42.0% in "
-                "medium and 73.0% in high risk. The segmentation is not decoration — it "
-                "orders the portfolio correctly.", "pt": 10.6, "color": TEXT,
-           "space_after": 0, "spacing": 1.18}])
+          {"t": "Across all 7,043 rows, observed churn rises from 9.5% (low) to 42.0% "
+                "(medium) to 73.0% (high). This demonstrates risk ordering in this "
+                "dataset, not independent or external validation.", "pt": 10.6,
+           "color": TEXT, "space_after": 0, "spacing": 1.18}])
     rect(s, px, p2[0], pw, p2[1], fill=PANEL, edge=BAD, edge_w=1.2)
     text(s, px + 0.20, p2[0] + 0.16, pw - 0.40, p2[1] - 0.32,
          [{"t": "THE OPERATIONAL PAYOFF", "pt": 10.5, "color": BAD, "bold": True,
            "mono": True, "space_after": 5},
-          {"t": "Instead of calling 7,043 customers, the team starts with 1,135 — 16.1% "
-                "of the base, where 73% will actually leave — carrying $92,539 of "
-                "recurring monthly charges.", "pt": 10.6, "color": TEXT, "space_after": 0,
+          {"t": "The team can prioritise 1,135 high-risk rows (16.1% of the base). In "
+                "this dataset, 73% of that band churned; its observed monthly charges "
+                "total $92,539.", "pt": 10.6, "color": TEXT, "space_after": 0,
            "spacing": 1.18}])
     footer(s, n, phase=9)
     notes(s, """
 (8:05–8:40) "A probability isn't something a retention agent can act on, so I cut
 it into three bands."
-Then the validation, which is the point of the slide: "I checked the bands against
-the real churn labels. Low risk actually churns 9.5%, medium 42%, high 73%. The
-band is a genuine ordering of risk, not a cosmetic split."
-Close operationally: "the team starts with 1,135 customers instead of 7,043."
+Then the in-dataset check: "Across this full portfolio, observed churn rises from
+9.5% in low risk, to 42% in medium and 73% in high. That shows the bands order
+this dataset; it is not independent or external validation."
+Close operationally: "the team can prioritise 1,135 high-risk rows, rather than
+starting with all 7,043." Do not generalise the 73% rate beyond this dataset.
 """)
 
     # =========================================================== 15 PHASE 11
@@ -1351,11 +1356,11 @@ serving on the same preprocessing and scoring path.
     text(s, M + col + 0.48, CONTENT_TOP + 0.18, col - 0.44, CAV - 0.36,
          [{"t": "FAIRNESS — AN OPEN QUESTION", "pt": 11, "color": BAD, "bold": True,
            "mono": True, "space_after": 7},
-          {"t": "▸  Senior citizens churn at 41.7% — nearly double the base rate. A model "
-                "optimising for churn risk will systematically concentrate its retention "
-                "offers on them.", "pt": 10.6, "color": TEXT, "space_after": 5,
-           "spacing": 1.16},
-          {"t": "▸  A blanket discount aimed at that group is not neutral; it can read as "
+          {"t": "▸  Senior-customer churn is 41.7% vs 23.6% for non-seniors (1.77×); the "
+                "overall rate is 26.54%. Senior status is a model input; whether scores "
+                "or offers concentrate unevenly requires a subgroup audit.", "pt": 10.6,
+           "color": TEXT, "space_after": 5, "spacing": 1.16},
+          {"t": "▸  A blanket age-based discount could be inequitable or perceived as "
                 "exploitative pricing.", "pt": 10.6, "color": TEXT, "space_after": 5,
            "spacing": 1.16},
           {"t": "▸  No bias audit has been run. Before this touched real customers, that "
@@ -1379,15 +1384,16 @@ serving on the same preprocessing and scoring path.
            "spacing": 1.16}])
     footer(s, n, complete_through=len(PHASES))
     notes(s, """
-(11:00–11:30) Most students hide this slide. Put it up and read it.
+(11:00–11:30) Most students hide this slide. Put it up and speak precisely.
 "Three things I would not do with this model today. I wouldn't trust it on a
 different market — it has only ever seen one telecom. I wouldn't quote revenue as
-savings, only as exposure. And I wouldn't ship a retention campaign aimed at
-senior citizens without a bias audit — they churn at 41.7%, nearly double the
-base rate, so a risk-optimising model will concentrate offers on them."
-Then close the loop: "and the fix for the recall number is already measured — 0.35
-catches 71.7%. That's the next cycle, which starts back at Phase 02 with drift
-monitoring."
+savings, only as exposure. And I wouldn't target by age without a fairness audit.
+Senior-customer churn is 41.7% versus 23.6% for non-seniors (1.77×); the overall
+rate is 26.54%. We have not measured subgroup errors or offer allocation, so that
+gap is a fairness risk to audit, not a claim of demonstrated bias."
+Then close the loop: "and the operating-point experiment shows what is possible —
+0.35 reaches 71.7% recall and 62.98% F1 on this test split. Choosing a threshold
+still needs a business decision about offer capacity and the cost of false alarms."
 """)
 
     # =========================================================== 21 LIVE DEMO & LINKS
